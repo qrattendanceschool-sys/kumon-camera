@@ -1,815 +1,1588 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Kumon Camera</title>
+<meta charset="UTF-8">
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
-    body {
-      margin: 0;
-      padding: 20px;
-      background: #f5f6f8;
-      font-family: Arial, sans-serif;
-      color: #111827;
-    }
+<title>Kumon QR Scanner</title>
 
-    .container {
-      max-width: 900px;
-      margin: auto;
-    }
 
-    .header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+<style>
 
-    .header h1 {
-      margin: 10px 0 5px;
-      font-size: 32px;
-    }
+* {
+  box-sizing: border-box;
+}
 
-    .subtitle {
-      color: #667085;
-      font-size: 18px;
-    }
 
-    .card {
-      background: white;
-      border-radius: 18px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    }
+body {
 
-    .camera-box {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      background: #111;
-      border-radius: 15px;
-      overflow: hidden;
-    }
+  margin: 0;
 
-    #video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: none;
-    }
+  padding: 15px;
 
-    #placeholder {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 20px;
-    }
+  background: #f3f4f6;
 
-    /* กรอบเล็ง QR */
-    .scan-frame {
-      position: absolute;
-      width: 55%;
-      aspect-ratio: 1;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      border: 4px solid white;
-      border-radius: 15px;
-      pointer-events: none;
-      display: none;
-    }
+  color: #111827;
 
-    .scan-line {
-      position: absolute;
-      left: 5%;
-      width: 90%;
-      height: 3px;
-      background: red;
-      top: 50%;
-      animation: scan 2s infinite;
-    }
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Arial,
+    sans-serif;
 
-    @keyframes scan {
-      0% {
-        top: 10%;
-      }
-      50% {
-        top: 90%;
-      }
-      100% {
-        top: 10%;
-      }
-    }
+}
 
-    .buttons {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-top: 18px;
-      flex-wrap: wrap;
-    }
 
-    button {
-      border: none;
-      border-radius: 12px;
-      padding: 14px 28px;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.container {
 
-    #startBtn {
-      background: #2563eb;
-      color: white;
-    }
+  max-width: 850px;
 
-    #stopBtn {
-      background: #fca5a5;
-      color: white;
-    }
+  margin: auto;
 
-    #switchBtn {
-      background: #9ca3af;
-      color: white;
-    }
+}
 
-    button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
 
-    .status {
-      margin-top: 18px;
-      padding: 15px;
-      border-radius: 12px;
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-      background: #f2f4f7;
-    }
+/* =====================================================
+   HEADER
+===================================================== */
 
-    .success {
-      background: #dcfce7;
-      color: #166534;
-    }
+.header {
 
-    .error {
-      background: #fee2e2;
-      color: #991b1b;
-    }
+  text-align: center;
 
-    .result {
-      margin-top: 15px;
-      padding: 20px;
-      background: #f8fafc;
-      border-radius: 12px;
-      text-align: left;
-      display: none;
-    }
+  margin-bottom: 15px;
 
-    .result-title {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
+}
 
-    #qrResult {
-      font-size: 20px;
-      word-break: break-all;
-      background: white;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-    }
 
-    canvas {
-      display: none;
-    }
+.header h1 {
 
-    @media (max-width: 600px) {
-      body {
-        padding: 10px;
-      }
+  margin: 5px 0;
 
-      .header h1 {
-        font-size: 26px;
-      }
+  font-size: 30px;
 
-      .subtitle {
-        font-size: 16px;
-      }
+}
 
-      button {
-        width: 100%;
-      }
-    }
-  </style>
+
+.subtitle {
+
+  color: #6b7280;
+
+  font-size: 16px;
+
+}
+
+
+/* =====================================================
+   CARD
+===================================================== */
+
+.card {
+
+  background: white;
+
+  border-radius: 18px;
+
+  padding: 15px;
+
+  margin-bottom: 15px;
+
+  box-shadow:
+    0 2px 10px rgba(0,0,0,.07);
+
+}
+
+
+/* =====================================================
+   CAMERA
+===================================================== */
+
+.camera-container {
+
+  position: relative;
+
+  width: 100%;
+
+  background: #000;
+
+  border-radius: 15px;
+
+  overflow: hidden;
+
+}
+
+
+video {
+
+  width: 100%;
+
+  display: block;
+
+  background: #000;
+
+}
+
+
+.camera-placeholder {
+
+  position: absolute;
+
+  inset: 0;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  color: white;
+
+  font-size: 20px;
+
+  text-align: center;
+
+}
+
+
+.scan-frame {
+
+  position: absolute;
+
+  width: 60%;
+
+  max-width: 350px;
+
+  aspect-ratio: 1;
+
+  left: 50%;
+
+  top: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  border:
+    4px solid white;
+
+  border-radius: 18px;
+
+  pointer-events: none;
+
+  display: none;
+
+}
+
+
+.scan-frame::before,
+.scan-frame::after {
+
+  content: "";
+
+  position: absolute;
+
+  width: 35px;
+
+  height: 35px;
+
+  border-color: #22c55e;
+
+}
+
+
+.scan-frame::before {
+
+  left: -4px;
+
+  top: -4px;
+
+  border-left: 5px solid;
+  border-top: 5px solid;
+
+}
+
+
+.scan-frame::after {
+
+  right: -4px;
+
+  bottom: -4px;
+
+  border-right: 5px solid;
+  border-bottom: 5px solid;
+
+}
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.buttons {
+
+  display: flex;
+
+  gap: 10px;
+
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  margin-top: 15px;
+
+}
+
+
+button {
+
+  border: none;
+
+  border-radius: 12px;
+
+  padding: 13px 22px;
+
+  font-size: 17px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+}
+
+
+button:disabled {
+
+  opacity: .4;
+
+  cursor: not-allowed;
+
+}
+
+
+.btn-start {
+
+  background: #2563eb;
+
+  color: white;
+
+}
+
+
+.btn-stop {
+
+  background: #ef4444;
+
+  color: white;
+
+}
+
+
+.btn-switch {
+
+  background: #6b7280;
+
+  color: white;
+
+}
+
+
+.btn-continue {
+
+  background: #16a34a;
+
+  color: white;
+
+  width: 100%;
+
+}
+
+
+.btn-clear {
+
+  background: #e5e7eb;
+
+  color: #374151;
+
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+.status {
+
+  margin-top: 15px;
+
+  padding: 14px;
+
+  border-radius: 12px;
+
+  text-align: center;
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  background: #f3f4f6;
+
+}
+
+
+.status.success {
+
+  background: #dcfce7;
+
+  color: #166534;
+
+}
+
+
+.status.error {
+
+  background: #fee2e2;
+
+  color: #991b1b;
+
+}
+
+
+/* =====================================================
+   RESULT
+===================================================== */
+
+.result {
+
+  display: none;
+
+}
+
+
+.result.success {
+
+  border:
+    3px solid #22c55e;
+
+}
+
+
+.result-title {
+
+  text-align: center;
+
+  font-size: 26px;
+
+  font-weight: 800;
+
+  color: #166534;
+
+  margin-bottom: 15px;
+
+}
+
+
+.result-label {
+
+  font-size: 14px;
+
+  color: #6b7280;
+
+  margin-bottom: 5px;
+
+}
+
+
+.qr-value {
+
+  background: #f9fafb;
+
+  border:
+    1px solid #d1d5db;
+
+  border-radius: 10px;
+
+  padding: 15px;
+
+  font-size: 20px;
+
+  font-weight: 700;
+
+  word-break: break-all;
+
+}
+
+
+.scan-time {
+
+  margin-top: 10px;
+
+  text-align: center;
+
+  color: #6b7280;
+
+  font-size: 14px;
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (
+  max-width: 600px
+) {
+
+  body {
+
+    padding: 8px;
+
+  }
+
+
+  .header h1 {
+
+    font-size: 25px;
+
+  }
+
+
+  button {
+
+    width: 100%;
+
+  }
+
+}
+
+</style>
+
 </head>
+
 
 <body>
 
+
 <div class="container">
 
+
+  <!-- =================================================
+       HEADER
+  ================================================== -->
+
   <div class="header">
-    <h1>📷 Kumon Camera</h1>
+
+    <h1>
+      📷 Kumon QR Scanner
+    </h1>
+
     <div class="subtitle">
-      QR Attendance Camera
+      ระบบสแกน QR Attendance
     </div>
+
   </div>
+
+
+
+  <!-- =================================================
+       CAMERA
+  ================================================== -->
 
   <div class="card">
 
-    <div class="camera-box">
 
-      <video id="video" autoplay playsinline muted></video>
+    <div class="camera-container">
 
-      <div id="placeholder">
+      <video
+        id="video"
+        autoplay
+        playsinline
+        muted
+      ></video>
+
+
+      <div
+        id="placeholder"
+        class="camera-placeholder"
+      >
+
+        📷<br>
         กด "เปิดกล้อง"
+
       </div>
 
-      <div class="scan-frame" id="scanFrame">
-        <div class="scan-line"></div>
-      </div>
+
+      <div
+        id="scanFrame"
+        class="scan-frame"
+      ></div>
 
     </div>
+
+
+
+    <!-- BUTTONS -->
 
     <div class="buttons">
 
-      <button id="startBtn">
-        เปิดกล้อง
+
+      <button
+        id="startBtn"
+        class="btn-start"
+      >
+
+        📷 เปิดกล้อง
+
       </button>
 
-      <button id="stopBtn" disabled>
-        ปิดกล้อง
+
+      <button
+        id="stopBtn"
+        class="btn-stop"
+        disabled
+      >
+
+        ⛔ ปิดกล้อง
+
       </button>
 
-      <button id="switchBtn" disabled>
+
+      <button
+        id="switchBtn"
+        class="btn-switch"
+        disabled
+      >
+
         🔄 สลับกล้อง
+
       </button>
 
-    </div>
-
-    <div id="status" class="status">
-      กล้อง: ยังไม่ได้เปิด
-    </div>
-
-    <div id="result" class="result">
-
-      <div class="result-title">
-        📱 QR Code ที่อ่านได้
-      </div>
-
-      <div id="qrResult"></div>
 
     </div>
+
+
+    <!-- STATUS -->
+
+    <div
+      id="status"
+      class="status"
+    >
+
+      กล้องยังไม่ได้เปิด
+
+    </div>
+
 
   </div>
 
+
+
+  <!-- =================================================
+       RESULT
+  ================================================== -->
+
+  <div
+    id="result"
+    class="card result"
+  >
+
+
+    <div class="result-title">
+
+      ✅ อ่าน QR สำเร็จ
+
+    </div>
+
+
+    <div class="result-label">
+
+      ข้อมูล QR Code
+
+    </div>
+
+
+    <div
+      id="qrValue"
+      class="qr-value"
+    ></div>
+
+
+    <div
+      id="scanTime"
+      class="scan-time"
+    ></div>
+
+
+    <div class="buttons">
+
+
+      <button
+        id="continueBtn"
+        class="btn-continue"
+      >
+
+        🔍 สแกนต่อ
+
+      </button>
+
+
+      <button
+        id="clearBtn"
+        class="btn-clear"
+      >
+
+        ล้างผลลัพธ์
+
+      </button>
+
+
+    </div>
+
+
+  </div>
+
+
 </div>
 
-<canvas id="canvas"></canvas>
+
 
 <script>
 
-  const video = document.getElementById("video");
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d", {
-    willReadFrequently: true
-  });
+/* =====================================================
+   ELEMENTS
+===================================================== */
 
-  const startBtn = document.getElementById("startBtn");
-  const stopBtn = document.getElementById("stopBtn");
-  const switchBtn = document.getElementById("switchBtn");
+const video =
+  document.getElementById(
+    "video"
+  );
 
-  const statusBox = document.getElementById("status");
-  const placeholder = document.getElementById("placeholder");
-  const scanFrame = document.getElementById("scanFrame");
 
-  const resultBox = document.getElementById("result");
-  const qrResult = document.getElementById("qrResult");
+const placeholder =
+  document.getElementById(
+    "placeholder"
+  );
 
-  let stream = null;
-  let scanning = false;
-  let cameras = [];
-  let currentCameraIndex = 0;
 
-  let lastQR = "";
-  let lastQRTime = 0;
+const scanFrame =
+  document.getElementById(
+    "scanFrame"
+  );
 
-  // =========================================================
-  // แสดงสถานะ
-  // =========================================================
 
-  function setStatus(message, type = "") {
+const statusBox =
+  document.getElementById(
+    "status"
+  );
 
-    statusBox.textContent = message;
 
-    statusBox.className = "status";
+const resultBox =
+  document.getElementById(
+    "result"
+  );
 
-    if (type) {
-      statusBox.classList.add(type);
-    }
+
+const qrValue =
+  document.getElementById(
+    "qrValue"
+  );
+
+
+const scanTime =
+  document.getElementById(
+    "scanTime"
+  );
+
+
+const startBtn =
+  document.getElementById(
+    "startBtn"
+  );
+
+
+const stopBtn =
+  document.getElementById(
+    "stopBtn"
+  );
+
+
+const switchBtn =
+  document.getElementById(
+    "switchBtn"
+  );
+
+
+const continueBtn =
+  document.getElementById(
+    "continueBtn"
+  );
+
+
+const clearBtn =
+  document.getElementById(
+    "clearBtn"
+  );
+
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
+let stream = null;
+
+let scanning = false;
+
+let cameras = [];
+
+let currentCameraIndex = 0;
+
+let lastQR = "";
+
+let lastQRTime = 0;
+
+let detector = null;
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+function setStatus(
+  message,
+  type = ""
+) {
+
+  statusBox.textContent =
+    message;
+
+  statusBox.className =
+    "status";
+
+  if (type) {
+
+    statusBox.classList.add(
+      type
+    );
 
   }
 
+}
 
-  // =========================================================
-  // เปิดกล้อง
-  // =========================================================
 
-  async function startCamera() {
+/* =====================================================
+   BEEP
+===================================================== */
 
-    try {
+function beep() {
 
-      stopCamera();
+  try {
 
-      setStatus("กำลังเปิดกล้อง...");
+    const AudioContext =
+      window.AudioContext ||
+      window.webkitAudioContext;
 
-      const constraints = {
+
+    const audioContext =
+      new AudioContext();
+
+
+    const oscillator =
+      audioContext.createOscillator();
+
+
+    const gain =
+      audioContext.createGain();
+
+
+    oscillator.connect(
+      gain
+    );
+
+
+    gain.connect(
+      audioContext.destination
+    );
+
+
+    oscillator.frequency.value =
+      1000;
+
+
+    gain.gain.value =
+      0.15;
+
+
+    oscillator.start();
+
+
+    oscillator.stop(
+      audioContext.currentTime +
+      0.12
+    );
+
+  }
+
+  catch (error) {
+
+    console.log(
+      "Audio error:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   START CAMERA
+===================================================== */
+
+async function startCamera(
+  deviceId = null
+) {
+
+  try {
+
+    stopCamera();
+
+
+    setStatus(
+      "กำลังเปิดกล้อง..."
+    );
+
+
+    let constraints;
+
+
+    if (deviceId) {
+
+      constraints = {
+
         video: {
-          facingMode: {
-            ideal: "environment"
+
+          deviceId: {
+            exact: deviceId
           },
+
           width: {
             ideal: 1280
           },
+
           height: {
             ideal: 720
           }
+
         },
+
         audio: false
+
       };
 
-      stream = await navigator.mediaDevices.getUserMedia(
-        constraints
-      );
-
-      video.srcObject = stream;
-
-      await video.play();
-
-      video.style.display = "block";
-      placeholder.style.display = "none";
-      scanFrame.style.display = "block";
-
-      scanning = true;
-
-      startBtn.disabled = true;
-      stopBtn.disabled = false;
-      switchBtn.disabled = false;
-
-      setStatus(
-        "✅ เปิดกล้องสำเร็จ — พร้อมสแกน QR",
-        "success"
-      );
-
-      await loadCameras();
-
-      requestAnimationFrame(scanQR);
-
-    } catch (error) {
-
-      console.error(error);
-
-      let message = "เปิดกล้องไม่สำเร็จ";
-
-      if (error.name === "NotAllowedError") {
-        message =
-          "❌ Browser ไม่อนุญาตให้ใช้กล้อง";
-      }
-
-      else if (error.name === "NotFoundError") {
-        message =
-          "❌ ไม่พบกล้อง";
-      }
-
-      else if (error.name === "NotReadableError") {
-        message =
-          "❌ กล้องกำลังถูกใช้งานโดยโปรแกรมอื่น";
-      }
-
-      else if (error.name === "SecurityError") {
-        message =
-          "❌ Browser บล็อกการเข้าถึงกล้อง";
-      }
-
-      setStatus(
-        message + " (" + error.name + ")",
-        "error"
-      );
-
     }
 
-  }
+    else {
 
+      constraints = {
 
-  // =========================================================
-  // ปิดกล้อง
-  // =========================================================
+        video: {
 
-  function stopCamera() {
-
-    scanning = false;
-
-    if (stream) {
-
-      stream.getTracks().forEach(track => {
-        track.stop();
-      });
-
-      stream = null;
-
-    }
-
-    video.srcObject = null;
-
-    video.style.display = "none";
-    placeholder.style.display = "flex";
-    scanFrame.style.display = "none";
-
-    startBtn.disabled = false;
-    stopBtn.disabled = true;
-    switchBtn.disabled = true;
-
-  }
-
-
-  // =========================================================
-  // หา Camera ทั้งหมด
-  // =========================================================
-
-  async function loadCameras() {
-
-    try {
-
-      const devices =
-        await navigator.mediaDevices.enumerateDevices();
-
-      cameras = devices.filter(
-        device => device.kind === "videoinput"
-      );
-
-      console.log("Cameras:", cameras);
-
-      if (cameras.length > 1) {
-        switchBtn.disabled = false;
-      }
-
-    } catch (error) {
-
-      console.error(
-        "ไม่สามารถอ่านรายการกล้อง",
-        error
-      );
-
-    }
-
-  }
-
-
-  // =========================================================
-  // สลับกล้อง
-  // =========================================================
-
-  async function switchCamera() {
-
-    if (cameras.length < 2) {
-
-      setStatus(
-        "พบกล้องเพียง 1 ตัว",
-        "error"
-      );
-
-      return;
-
-    }
-
-    currentCameraIndex++;
-
-    if (
-      currentCameraIndex >= cameras.length
-    ) {
-
-      currentCameraIndex = 0;
-
-    }
-
-    const camera =
-      cameras[currentCameraIndex];
-
-    try {
-
-      stopCamera();
-
-      setStatus(
-        "กำลังสลับกล้อง..."
-      );
-
-      stream =
-        await navigator.mediaDevices.getUserMedia({
-
-          video: {
-            deviceId: {
-              exact: camera.deviceId
-            },
-            width: {
-              ideal: 1280
-            },
-            height: {
-              ideal: 720
-            }
+          facingMode: {
+            ideal: "environment"
           },
 
-          audio: false
+          width: {
+            ideal: 1280
+          },
 
-        });
+          height: {
+            ideal: 720
+          }
 
-      video.srcObject = stream;
+        },
 
-      await video.play();
+        audio: false
 
-      video.style.display = "block";
-      placeholder.style.display = "none";
-      scanFrame.style.display = "block";
-
-      scanning = true;
-
-      startBtn.disabled = true;
-      stopBtn.disabled = false;
-      switchBtn.disabled = false;
-
-      setStatus(
-        "✅ สลับกล้องสำเร็จ — พร้อมสแกน QR",
-        "success"
-      );
-
-      requestAnimationFrame(scanQR);
+      };
 
     }
 
-    catch (error) {
 
-      console.error(error);
-
-      setStatus(
-        "❌ สลับกล้องไม่สำเร็จ: " +
-        error.name,
-        "error"
-      );
-
-    }
-
-  }
-
-
-  // =========================================================
-  // QR Scanner
-  // =========================================================
-
-  function scanQR() {
-
-    if (!scanning) {
-      return;
-    }
-
-    if (
-      video.readyState ===
-      video.HAVE_ENOUGH_DATA
-    ) {
-
-      const width = video.videoWidth;
-      const height = video.videoHeight;
-
-      if (width > 0 && height > 0) {
-
-        canvas.width = width;
-        canvas.height = height;
-
-        ctx.drawImage(
-          video,
-          0,
-          0,
-          width,
-          height
+    stream =
+      await navigator.mediaDevices
+        .getUserMedia(
+          constraints
         );
 
-        const imageData =
-          ctx.getImageData(
-            0,
-            0,
-            width,
-            height
-          );
 
-        // -----------------------------------------
-        // ใช้ BarcodeDetector ถ้า Browser รองรับ
-        // -----------------------------------------
-
-        if (
-          "BarcodeDetector" in window
-        ) {
-
-          detectBarcode();
-
-        }
-
-      }
-
-    }
-
-    requestAnimationFrame(scanQR);
-
-  }
+    video.srcObject =
+      stream;
 
 
-  // =========================================================
-  // BarcodeDetector
-  // =========================================================
-
-  async function detectBarcode() {
-
-    try {
-
-      const detector =
-        new BarcodeDetector({
-          formats: ["qr_code"]
-        });
-
-      const barcodes =
-        await detector.detect(canvas);
-
-      if (
-        barcodes &&
-        barcodes.length > 0
-      ) {
-
-        const value =
-          barcodes[0].rawValue;
-
-        handleQR(value);
-
-      }
-
-    }
-
-    catch (error) {
-
-      console.log(
-        "QR detection:",
-        error
-      );
-
-    }
-
-  }
+    await video.play();
 
 
-  // =========================================================
-  // เมื่ออ่าน QR สำเร็จ
-  // =========================================================
+    video.style.display =
+      "block";
 
-  function handleQR(value) {
 
-    if (!value) {
-      return;
-    }
+    placeholder.style.display =
+      "none";
 
-    const now = Date.now();
 
-    // ป้องกันการอ่าน QR เดิมซ้ำรัว ๆ
-    if (
-      value === lastQR &&
-      now - lastQRTime < 3000
-    ) {
+    scanFrame.style.display =
+      "block";
 
-      return;
 
-    }
+    scanning =
+      true;
 
-    lastQR = value;
-    lastQRTime = now;
 
-    console.log(
-      "QR FOUND:",
-      value
-    );
+    startBtn.disabled =
+      true;
 
-    qrResult.textContent = value;
 
-    resultBox.style.display = "block";
+    stopBtn.disabled =
+      false;
+
 
     setStatus(
-      "✅ อ่าน QR สำเร็จ",
+      "✅ กล้องพร้อม — เล็ง QR ได้เลย",
       "success"
     );
 
-    // เสียงแจ้งเตือน
-    beep();
+
+    await loadCameras();
+
+
+    requestAnimationFrame(
+      scanQR
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Camera error:",
+      error
+    );
+
+
+    let message =
+      "เปิดกล้องไม่สำเร็จ";
+
+
+    if (
+      error.name ===
+      "NotAllowedError"
+    ) {
+
+      message =
+        "❌ Browser ไม่อนุญาตให้ใช้กล้อง";
+
+    }
+
+    else if (
+      error.name ===
+      "NotFoundError"
+    ) {
+
+      message =
+        "❌ ไม่พบกล้อง";
+
+    }
+
+    else if (
+      error.name ===
+      "NotReadableError"
+    ) {
+
+      message =
+        "❌ กล้องถูกใช้งานโดยโปรแกรมอื่น";
+
+    }
+
+
+    setStatus(
+      message,
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   STOP CAMERA
+===================================================== */
+
+function stopCamera() {
+
+  scanning =
+    false;
+
+
+  if (stream) {
+
+    stream
+      .getTracks()
+      .forEach(
+        track => track.stop()
+      );
+
+
+    stream =
+      null;
 
   }
 
 
-  // =========================================================
-  // เสียงเมื่ออ่าน QR
-  // =========================================================
+  video.srcObject =
+    null;
 
-  function beep() {
+
+  video.style.display =
+    "none";
+
+
+  placeholder.style.display =
+    "flex";
+
+
+  scanFrame.style.display =
+    "none";
+
+
+  startBtn.disabled =
+    false;
+
+
+  stopBtn.disabled =
+    true;
+
+
+  switchBtn.disabled =
+    true;
+
+}
+
+
+/* =====================================================
+   LOAD CAMERAS
+===================================================== */
+
+async function loadCameras() {
+
+  try {
+
+    const devices =
+      await navigator.mediaDevices
+        .enumerateDevices();
+
+
+    cameras =
+      devices.filter(
+        device =>
+          device.kind ===
+          "videoinput"
+      );
+
+
+    console.log(
+      "Cameras:",
+      cameras
+    );
+
+
+    if (
+      cameras.length > 1
+    ) {
+
+      switchBtn.disabled =
+        false;
+
+    }
+
+  }
+
+  catch (error) {
+
+    console.error(
+      error
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   SWITCH CAMERA
+===================================================== */
+
+async function switchCamera() {
+
+  if (
+    cameras.length < 2
+  ) {
+
+    return;
+
+  }
+
+
+  currentCameraIndex++;
+
+
+  if (
+    currentCameraIndex >=
+    cameras.length
+  ) {
+
+    currentCameraIndex =
+      0;
+
+  }
+
+
+  const camera =
+    cameras[
+      currentCameraIndex
+    ];
+
+
+  setStatus(
+    "กำลังสลับกล้อง..."
+  );
+
+
+  await startCamera(
+    camera.deviceId
+  );
+
+}
+
+
+/* =====================================================
+   QR SCAN LOOP
+===================================================== */
+
+function scanQR() {
+
+  if (!scanning) {
+
+    return;
+
+  }
+
+
+  if (
+    video.readyState ===
+    video.HAVE_ENOUGH_DATA
+  ) {
+
+    if (
+      "BarcodeDetector"
+      in window
+    ) {
+
+      detectQR();
+
+    }
+
+  }
+
+
+  requestAnimationFrame(
+    scanQR
+  );
+
+}
+
+
+/* =====================================================
+   DETECT QR
+===================================================== */
+
+async function detectQR() {
+
+  if (!detector) {
 
     try {
 
-      const AudioContext =
-        window.AudioContext ||
-        window.webkitAudioContext;
+      detector =
+        new BarcodeDetector({
 
-      const audioContext =
-        new AudioContext();
+          formats: [
+            "qr_code"
+          ]
 
-      const oscillator =
-        audioContext.createOscillator();
-
-      const gain =
-        audioContext.createGain();
-
-      oscillator.connect(gain);
-      gain.connect(audioContext.destination);
-
-      oscillator.frequency.value = 1000;
-
-      gain.gain.value = 0.15;
-
-      oscillator.start();
-
-      oscillator.stop(
-        audioContext.currentTime + 0.12
-      );
+        });
 
     }
 
     catch (error) {
 
-      console.log(
-        "Audio error:",
+      console.error(
+        "BarcodeDetector not supported",
         error
       );
 
+      setStatus(
+        "Browser ไม่รองรับ QR Scanner",
+        "error"
+      );
+
+      scanning =
+        false;
+
+      return;
+
     }
 
   }
 
 
-  // =========================================================
-  // ปุ่ม
-  // =========================================================
+  try {
 
-  startBtn.addEventListener(
-    "click",
-    startCamera
-  );
+    const results =
+      await detector.detect(
+        video
+      );
 
-  stopBtn.addEventListener(
-    "click",
-    () => {
 
-      stopCamera();
+    if (
+      results &&
+      results.length > 0
+    ) {
 
-      setStatus(
-        "กล้อง: ปิดแล้ว"
+      const value =
+        results[0].rawValue;
+
+
+      handleQR(
+        value
       );
 
     }
-  );
-
-  switchBtn.addEventListener(
-    "click",
-    switchCamera
-  );
-
-
-  // =========================================================
-  // ตรวจสอบ Camera API
-  // =========================================================
-
-  if (
-    !navigator.mediaDevices ||
-    !navigator.mediaDevices.getUserMedia
-  ) {
-
-    setStatus(
-      "❌ Browser นี้ไม่รองรับ Camera API",
-      "error"
-    );
-
-    startBtn.disabled = true;
 
   }
+
+  catch (error) {
+
+    console.log(
+      "QR detection error:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   QR FOUND
+===================================================== */
+
+function handleQR(
+  value
+) {
+
+  if (!value) {
+
+    return;
+
+  }
+
+
+  const now =
+    Date.now();
+
+
+  /*
+   * ป้องกัน QR เดิมซ้ำ
+   */
+
+  if (
+
+    value === lastQR &&
+
+    now - lastQRTime < 3000
+
+  ) {
+
+    return;
+
+  }
+
+
+  lastQR =
+    value;
+
+
+  lastQRTime =
+    now;
+
+
+  console.log(
+    "QR FOUND:",
+    value
+  );
+
+
+  /*
+   * หยุดการ Scan
+   */
+
+  scanning =
+    false;
+
+
+  /*
+   * เสียง
+   */
+
+  beep();
+
+
+  /*
+   * แสดงข้อมูล
+   */
+
+  qrValue.textContent =
+    value;
+
+
+  const date =
+    new Date();
+
+
+  scanTime.textContent =
+    "เวลาอ่าน: " +
+    date.toLocaleTimeString(
+      "th-TH"
+    );
+
+
+  resultBox.style.display =
+    "block";
+
+
+  resultBox.classList.add(
+    "success"
+  );
+
+
+  /*
+   * สถานะ
+   */
+
+  setStatus(
+    "✅ อ่าน QR สำเร็จ",
+    "success"
+  );
+
+
+  /*
+   * หยุดกล้องจริง
+   */
+
+  if (stream) {
+
+    stream
+      .getTracks()
+      .forEach(
+        track => track.stop()
+      );
+
+
+    stream =
+      null;
+
+  }
+
+
+  video.srcObject =
+    null;
+
+
+  video.style.display =
+    "none";
+
+
+  scanFrame.style.display =
+    "none";
+
+
+  startBtn.disabled =
+    true;
+
+
+  stopBtn.disabled =
+    true;
+
+
+  switchBtn.disabled =
+    true;
+
+}
+
+
+/* =====================================================
+   SCAN AGAIN
+===================================================== */
+
+continueBtn.addEventListener(
+
+  "click",
+
+  async function() {
+
+    resultBox.style.display =
+      "none";
+
+
+    resultBox.classList.remove(
+      "success"
+    );
+
+
+    lastQR =
+      "";
+
+
+    setStatus(
+      "พร้อมสแกน QR"
+    );
+
+
+    await startCamera();
+
+  }
+
+);
+
+
+/* =====================================================
+   CLEAR RESULT
+===================================================== */
+
+clearBtn.addEventListener(
+
+  "click",
+
+  function() {
+
+    qrValue.textContent =
+      "";
+
+
+    scanTime.textContent =
+      "";
+
+
+    resultBox.style.display =
+      "none";
+
+
+    resultBox.classList.remove(
+      "success"
+    );
+
+  }
+
+);
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+startBtn.addEventListener(
+
+  "click",
+
+  function() {
+
+    startCamera();
+
+  }
+
+);
+
+
+stopBtn.addEventListener(
+
+  "click",
+
+  function() {
+
+    stopCamera();
+
+
+    setStatus(
+      "กล้อง: ปิดแล้ว"
+    );
+
+  }
+
+);
+
+
+switchBtn.addEventListener(
+
+  "click",
+
+  function() {
+
+    switchCamera();
+
+  }
+
+);
+
+
+/* =====================================================
+   CHECK CAMERA API
+===================================================== */
+
+window.addEventListener(
+
+  "load",
+
+  function() {
+
+    if (
+
+      !navigator.mediaDevices ||
+
+      !navigator.mediaDevices
+        .getUserMedia
+
+    ) {
+
+      setStatus(
+        "❌ Browser นี้ไม่รองรับ Camera API",
+        "error"
+      );
+
+
+      startBtn.disabled =
+        true;
+
+    }
+
+  }
+
+);
 
 </script>
 
