@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Kumon Camera</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f5f6f8;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 10px 0 5px;
+      font-size: 32px;
+    }
+
+    .subtitle {
+      color: #667085;
+      margin-bottom: 20px;
+      font-size: 18px;
+    }
+
+    .camera-box {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 15px;
+      border-radius: 18px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    video {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      background: #111;
+      border-radius: 14px;
+      display: block;
+    }
+
+    .buttons {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 14px 25px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    #startBtn {
+      background: #2864e8;
+      color: white;
+    }
+
+    #stopBtn {
+      background: #f5a3a3;
+      color: white;
+    }
+
+    #switchBtn {
+      background: #667085;
+      color: white;
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    #status {
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 10px;
+      background: #fff;
+      font-size: 18px;
+    }
+
+    .success {
+      color: #167a43;
+      background: #e7f8ee !important;
+    }
+
+    .error {
+      color: #b42318;
+      background: #fdecec !important;
+    }
+
+    .info {
+      color: #344054;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>📷 Kumon Camera</h1>
+
+  <div class="subtitle">
+    QR Attendance Camera
+  </div>
+
+  <div class="camera-box">
+
+    <video
+      id="video"
+      autoplay
+      playsinline
+      muted>
+    </video>
+
+    <div class="buttons">
+
+      <button id="startBtn">
+        เปิดกล้อง
+      </button>
+
+      <button id="stopBtn" disabled>
+        ปิดกล้อง
+      </button>
+
+      <button id="switchBtn" disabled>
+        🔄 สลับกล้อง
+      </button>
+
+    </div>
+
+    <div id="status" class="info">
+      กด "เปิดกล้อง" เพื่อเริ่มใช้งาน
+    </div>
+
+  </div>
+
+
+<script>
+
+let currentStream = null;
+let cameras = [];
+let currentCameraIndex = 0;
+
+
+// ===============================
+// แสดงสถานะ
+// ===============================
+
+function setStatus(message, type = "info") {
+
+  const status = document.getElementById("status");
+
+  status.textContent = message;
+
+  status.className = type;
+
+}
+
+
+// ===============================
+// หยุดกล้อง
+// ===============================
+
+function stopCamera() {
+
+  if (currentStream) {
+
+    currentStream.getTracks().forEach(track => {
+      track.stop();
+    });
+
+    currentStream = null;
+  }
+
+  const video = document.getElementById("video");
+
+  video.srcObject = null;
+
+  document.getElementById("stopBtn").disabled = true;
+
+  document.getElementById("switchBtn").disabled = true;
+
+}
+
+
+// ===============================
+// โหลดรายชื่อกล้อง
+// ===============================
+
+async function getCameras() {
+
+  try {
+
+    const devices =
+      await navigator.mediaDevices.enumerateDevices();
+
+    cameras = devices.filter(
+      device => device.kind === "videoinput"
+    );
+
+    if (cameras.length > 1) {
+
+      document.getElementById(
+        "switchBtn"
+      ).disabled = false;
+
+    }
+
+    return cameras;
+
+  } catch (error) {
+
+    console.error(error);
+
+    return [];
+
+  }
+
+}
+
+
+// ===============================
+// เปิดกล้อง
+// ===============================
+
+async function startCamera(cameraId = null) {
+
+  stopCamera();
+
+  setStatus(
+    "กำลังขอสิทธิ์ใช้งานกล้อง...",
+    "info"
+  );
+
+  try {
+
+    const constraints = {
+
+      video: cameraId
+        ? {
+            deviceId: {
+              exact: cameraId
+            }
+          }
+        : {
+            facingMode: {
+              ideal: "environment"
+            }
+          },
+
+      audio: false
+
+    };
+
+
+    const stream =
+      await navigator.mediaDevices.getUserMedia(
+        constraints
+      );
+
+
+    currentStream = stream;
+
+
+    const video =
+      document.getElementById("video");
+
+    video.srcObject = stream;
+
+
+    await video.play();
+
+
+    // หลังได้รับ permission แล้ว
+    // จะสามารถ enumerateDevices ได้ละเอียดขึ้น
+
+    await getCameras();
+
+
+    document.getElementById(
+      "stopBtn"
+    ).disabled = false;
+
+
+    setStatus(
+      "✅ เปิดกล้องสำเร็จ",
+      "success"
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Camera error:",
+      error
+    );
+
+
+    let message =
+      "เปิดกล้องไม่สำเร็จ";
+
+
+    if (error.name === "NotAllowedError") {
+
+      message =
+        "❌ Browser ไม่อนุญาตให้ใช้กล้อง";
+
+    }
+
+    else if (
+      error.name === "NotFoundError"
+    ) {
+
+      message =
+        "❌ ไม่พบกล้อง";
+
+    }
+
+    else if (
+      error.name === "NotReadableError"
+    ) {
+
+      message =
+        "❌ กล้องถูกใช้งานโดยโปรแกรมอื่น";
+
+    }
+
+    else if (
+      error.name === "SecurityError"
+    ) {
+
+      message =
+        "❌ Browser บล็อกการเข้าถึงกล้อง";
+
+    }
+
+    setStatus(
+      message +
+      " (" +
+      error.name +
+      ": " +
+      error.message +
+      ")",
+      "error"
+    );
+
+  }
+
+}
+
+
+// ===============================
+// สลับกล้อง
+// ===============================
+
+async function switchCamera() {
+
+  if (cameras.length < 2) {
+    return;
+  }
+
+
+  currentCameraIndex++;
+
+  if (
+    currentCameraIndex >=
+    cameras.length
+  ) {
+
+    currentCameraIndex = 0;
+
+  }
+
+
+  const camera =
+    cameras[currentCameraIndex];
+
+
+  await startCamera(
+    camera.deviceId
+  );
+
+}
+
+
+// ===============================
+// ปุ่มเปิดกล้อง
+// ===============================
+
+document
+  .getElementById("startBtn")
+  .addEventListener(
+    "click",
+    async () => {
+
+      await startCamera();
+
+    }
+  );
+
+
+// ===============================
+// ปุ่มปิดกล้อง
+// ===============================
+
+document
+  .getElementById("stopBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      stopCamera();
+
+      setStatus(
+        "ปิดกล้องแล้ว",
+        "info"
+      );
+
+    }
+  );
+
+
+// ===============================
+// ปุ่มสลับกล้อง
+// ===============================
+
+document
+  .getElementById("switchBtn")
+  .addEventListener(
+    "click",
+    async () => {
+
+      await switchCamera();
+
+    }
+  );
+
+
+// ===============================
+// ตรวจสอบ Browser
+// ===============================
+
+window.addEventListener(
+  "load",
+  () => {
+
+    if (
+      !navigator.mediaDevices ||
+      !navigator.mediaDevices.getUserMedia
+    ) {
+
+      setStatus(
+        "❌ Browser นี้ไม่รองรับ Camera API",
+        "error"
+      );
+
+      return;
+
+    }
+
+    setStatus(
+      "พร้อมใช้งาน — กด \"เปิดกล้อง\"",
+      "info"
+    );
+
+  }
+);
+
+</script>
+
+</body>
+</html>
