@@ -17,12 +17,35 @@
 
 <title>Kumon QR Attendance</title>
 
+<!-- FIXED CAMERA VERSION 2026-09-17 -->
 
 <!-- =====================================================
      QR SCANNER
      ===================================================== -->
 
 <script src="https://unpkg.com/html5-qrcode"></script>
+
+<script>
+window.addEventListener("error", function(e) {
+
+  if (
+    !window.Html5Qrcode &&
+    e.target &&
+    e.target.tagName === "SCRIPT"
+  ) {
+
+    const s =
+      document.createElement("script");
+
+    s.src =
+      "https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js";
+
+    document.head.appendChild(s);
+
+  }
+
+}, true);
+</script>
 
 
 <style>
@@ -688,15 +711,15 @@ button:disabled {
    ===================================================== */
 
 const API_URL =
-'https://script.google.com/macros/s/AKfycbyuISi-DgYLz_gGi0bqFybq0l6pIpXxS9xTkDdy8YnF7EIofZYjc3B9eZEgFiPwXAVR/exec';
+  'https://script.google.com/macros/s/AKfycbyuISi-DgYLz_gGi0bqFybq0l6pIpXxS9xTkDdy8YnF7EIofZYjc3B9eZEgFiPwXAVR/exec';
 
 
 const BRANCH_ID =
-'B001';
+  'B001';
 
 
 const DEVICE_ID =
-'B001-01';
+  'B001-01';
 
 
 /* =====================================================
@@ -723,55 +746,55 @@ let lastQRTime = 0;
    ===================================================== */
 
 const reader =
-document.getElementById('reader');
+  document.getElementById('reader');
 
 
 const statusBox =
-document.getElementById('status');
+  document.getElementById('status');
 
 
 const resultBox =
-document.getElementById('result');
+  document.getElementById('result');
 
 
 const studentName =
-document.getElementById('studentName');
+  document.getElementById('studentName');
 
 
 const directionBox =
-document.getElementById('direction');
+  document.getElementById('direction');
 
 
 const subjectBox =
-document.getElementById('subject');
+  document.getElementById('subject');
 
 
 const timeBox =
-document.getElementById('time');
+  document.getElementById('time');
 
 
 const durationBox =
-document.getElementById('duration');
+  document.getElementById('duration');
 
 
 const rawBox =
-document.getElementById('raw');
+  document.getElementById('raw');
 
 
 const scanFrame =
-document.getElementById('scanFrame');
+  document.getElementById('scanFrame');
 
 
 const startButton =
-document.getElementById('startButton');
+  document.getElementById('startButton');
 
 
 const stopButton =
-document.getElementById('stopButton');
+  document.getElementById('stopButton');
 
 
 const switchButton =
-document.getElementById('switchButton');
+  document.getElementById('switchButton');
 
 
 /* =====================================================
@@ -884,25 +907,17 @@ function beep(
 
 async function startCamera() {
 
-  if (
-    cameraRunning ||
-    processing
-  ) {
-
+  if (cameraRunning || processing) {
     return;
-
   }
 
 
   try {
 
-    if (
-      typeof Html5Qrcode ===
-      'undefined'
-    ) {
+    if (typeof Html5Qrcode === 'undefined') {
 
       throw new Error(
-        'ไม่พบระบบ QR Scanner'
+        'ไม่พบระบบ QR Scanner — กรุณารีเฟรชหน้าเว็บ'
       );
 
     }
@@ -915,13 +930,12 @@ async function startCamera() {
 
 
     /*
-     * สร้าง scanner ใหม่
+     * สร้าง scanner
      */
 
     if (!scanner) {
 
-      reader.innerHTML =
-        '';
+      reader.innerHTML = '';
 
       scanner =
         new Html5Qrcode(
@@ -929,112 +943,152 @@ async function startCamera() {
         );
 
     }
+    else {
 
-
-    /*
-     * ขอรายการกล้อง
-     */
-
-    cameras =
-      await Html5Qrcode.getCameras();
-
-
-    if (
-      !cameras ||
-      cameras.length === 0
-    ) {
-
-      throw new Error(
-        'ไม่พบกล้องในอุปกรณ์'
-      );
+      reader.innerHTML = '';
 
     }
 
 
     /*
-     * เลือกกล้องหลัง
+     * Configuration
      */
 
-    let backIndex =
-      cameras.findIndex(
-        camera =>
-          /back|rear|environment/i.test(
-            camera.label || ''
-          )
-      );
+    const config = {
+
+      fps: 10,
+
+      qrbox: function(
+        width,
+        height
+      ) {
+
+        const size =
+          Math.floor(
+            Math.min(
+              width,
+              height
+            ) * 0.65
+          );
 
 
-    if (
-      backIndex < 0
-    ) {
+        return {
 
-      backIndex = 0;
+          width:
+            Math.min(
+              size,
+              320
+            ),
 
-    }
+          height:
+            Math.min(
+              size,
+              320
+            )
 
-
-    currentCameraIndex =
-      backIndex;
-
-
-    const cameraId =
-      cameras[
-        currentCameraIndex
-      ].id;
-
-
-    /*
-     * เริ่มกล้อง
-     */
-
-    await scanner.start(
-
-      cameraId,
-
-      {
-
-        fps: 10,
-
-        qrbox:
-          function(
-            width,
-            height
-          ) {
-
-            const size =
-              Math.floor(
-                Math.min(
-                  width,
-                  height
-                ) * 0.65
-              );
-
-
-            return {
-
-              width:
-                Math.min(
-                  size,
-                  320
-                ),
-
-              height:
-                Math.min(
-                  size,
-                  320
-                )
-
-            };
-
-          }
+        };
 
       },
 
-      onScanSuccess,
+      aspectRatio: 1.0
 
-      function() {}
+    };
 
-    );
+
+    /*
+     * ขั้นแรก:
+     * พยายามเปิดกล้องหลัง
+     */
+
+    try {
+
+      await scanner.start(
+
+        {
+          facingMode: {
+            exact: 'environment'
+          }
+        },
+
+        config,
+
+        onScanSuccess,
+
+        function() {}
+
+      );
+
+    }
+
+
+    /*
+     * ถ้าเปิดกล้องหลังไม่ได้
+     * ให้ค้นหารายการกล้อง
+     */
+
+    catch(environmentError) {
+
+      console.warn(
+        'Environment camera failed:',
+        environmentError
+      );
+
+
+      cameras =
+        await Html5Qrcode.getCameras();
+
+
+      if (
+        !cameras ||
+        cameras.length === 0
+      ) {
+
+        throw new Error(
+          'ไม่พบกล้องในอุปกรณ์'
+        );
+
+      }
+
+
+      let backIndex =
+        cameras.findIndex(
+          function(camera) {
+
+            return /back|rear|environment|หลัง/i
+              .test(
+                camera.label || ''
+              );
+
+          }
+        );
+
+
+      if (backIndex < 0) {
+
+        backIndex = 0;
+
+      }
+
+
+      currentCameraIndex =
+        backIndex;
+
+
+      await scanner.start(
+
+        cameras[
+          currentCameraIndex
+        ].id,
+
+        config,
+
+        onScanSuccess,
+
+        function() {}
+
+      );
+
+    }
 
 
     cameraRunning =
@@ -1043,6 +1097,48 @@ async function startCamera() {
 
     scanFrame.style.display =
       'block';
+
+
+    /*
+     * หลัง permission แล้ว
+     * ขอรายการกล้องอีกครั้ง
+     */
+
+    try {
+
+      cameras =
+        await Html5Qrcode.getCameras();
+
+
+      const backIndex =
+        cameras.findIndex(
+          function(camera) {
+
+            return /back|rear|environment|หลัง/i
+              .test(
+                camera.label || ''
+              );
+
+          }
+        );
+
+
+      if (backIndex >= 0) {
+
+        currentCameraIndex =
+          backIndex;
+
+      }
+
+    }
+    catch(e) {
+
+      console.warn(
+        'อ่านรายการกล้องไม่ได้:',
+        e
+      );
+
+    }
 
 
     setStatus(
@@ -1054,7 +1150,8 @@ async function startCamera() {
     updateButtons();
 
 
-  } catch(error) {
+  }
+  catch(error) {
 
     console.error(
       'Camera error:',
@@ -1084,7 +1181,7 @@ async function startCamera() {
     ) {
 
       message =
-        'ไม่ได้รับอนุญาตให้ใช้กล้อง กรุณาอนุญาต Camera';
+        'ไม่ได้รับอนุญาตให้ใช้กล้อง กรุณาอนุญาต Camera ใน Safari';
 
     }
 
@@ -1096,7 +1193,7 @@ async function startCamera() {
     ) {
 
       message =
-        'ไม่พบกล้อง';
+        'ไม่พบกล้องในอุปกรณ์';
 
     }
 
@@ -1135,6 +1232,11 @@ async function stopCamera() {
 
   if (!scanner) {
 
+    cameraRunning =
+      false;
+
+    updateButtons();
+
     return;
 
   }
@@ -1148,7 +1250,8 @@ async function stopCamera() {
 
     }
 
-  } catch(error) {
+  }
+  catch(error) {
 
     console.log(
       'stop error:',
@@ -1194,7 +1297,7 @@ async function switchCamera() {
 
   if (
     processing ||
-    cameras.length < 2
+    !scanner
   ) {
 
     return;
@@ -1220,6 +1323,22 @@ async function switchCamera() {
     }
 
 
+    cameras =
+      await Html5Qrcode.getCameras();
+
+
+    if (
+      !cameras ||
+      cameras.length < 2
+    ) {
+
+      throw new Error(
+        'อุปกรณ์นี้พบกล้องเพียง 1 ตัว'
+      );
+
+    }
+
+
     currentCameraIndex =
       (
         currentCameraIndex + 1
@@ -1227,54 +1346,54 @@ async function switchCamera() {
       cameras.length;
 
 
-    const cameraId =
-      cameras[
-        currentCameraIndex
-      ].id;
+    const config = {
+
+      fps: 10,
+
+      qrbox: function(
+        width,
+        height
+      ) {
+
+        const size =
+          Math.floor(
+            Math.min(
+              width,
+              height
+            ) * 0.65
+          );
+
+
+        return {
+
+          width:
+            Math.min(
+              size,
+              320
+            ),
+
+          height:
+            Math.min(
+              size,
+              320
+            )
+
+        };
+
+      },
+
+      aspectRatio: 1.0
+
+    };
 
 
     await scanner.start(
 
-      cameraId,
+      cameras[
+        currentCameraIndex
+      ].id,
 
-      {
-
-        fps: 10,
-
-        qrbox:
-          function(
-            width,
-            height
-          ) {
-
-            const size =
-              Math.floor(
-                Math.min(
-                  width,
-                  height
-                ) * 0.65
-              );
-
-
-            return {
-
-              width:
-                Math.min(
-                  size,
-                  320
-                ),
-
-              height:
-                Math.min(
-                  size,
-                  320
-                )
-
-            };
-
-          }
-
-      },
+      config,
 
       onScanSuccess,
 
@@ -1292,7 +1411,7 @@ async function switchCamera() {
 
 
     setStatus(
-      '🟢 พร้อมสแกน QR',
+      '🟢 สลับกล้องสำเร็จ — พร้อมสแกน QR',
       'success'
     );
 
@@ -1300,9 +1419,11 @@ async function switchCamera() {
     updateButtons();
 
 
-  } catch(error) {
+  }
+  catch(error) {
 
     console.error(
+      'Switch camera error:',
       error
     );
 
@@ -1311,13 +1432,20 @@ async function switchCamera() {
       false;
 
 
+    scanFrame.style.display =
+      'none';
+
+
     setStatus(
+
       '❌ สลับกล้องไม่สำเร็จ: ' +
       (
         error.message ||
-        error
+        String(error)
       ),
+
       'error'
+
     );
 
 
@@ -1329,7 +1457,7 @@ async function switchCamera() {
 
 
 /* =====================================================
-   JSONP
+   JSONP API
    ===================================================== */
 
 function callAPI(
@@ -1338,15 +1466,18 @@ function callAPI(
 ) {
 
   return new Promise(
-    (
+    function(
       resolve,
       reject
-    ) => {
-
+    ) {
 
       const callbackName =
         'kumonCallback_' +
-        Date.now();
+        Date.now() +
+        '_' +
+        Math.floor(
+          Math.random() * 100000
+        );
 
 
       const script =
@@ -1373,7 +1504,10 @@ function callAPI(
 
       Object.entries(params)
         .forEach(
-          ([key, value]) => {
+          function([
+            key,
+            value
+          ]) {
 
             if (
               value !== undefined &&
@@ -1397,7 +1531,7 @@ function callAPI(
 
       const timeout =
         setTimeout(
-          () => {
+          function() {
 
             if (finished) {
               return;
@@ -1435,16 +1569,18 @@ function callAPI(
             callbackName
           ];
 
-        } catch(error) {}
+        }
+        catch(e) {}
 
 
         if (
           script.parentNode
         ) {
 
-          script.parentNode.removeChild(
-            script
-          );
+          script.parentNode
+            .removeChild(
+              script
+            );
 
         }
 
@@ -1468,9 +1604,7 @@ function callAPI(
           cleanup();
 
 
-          if (
-            !response
-          ) {
+          if (!response) {
 
             reject(
               new Error(
@@ -1483,20 +1617,17 @@ function callAPI(
           }
 
 
-          /*
-           * Backend ของเรา
-           * ใช้ success:true
-           */
-
           if (
             response.success !== true
           ) {
 
             reject(
               new Error(
+
                 response.error ||
                 response.message ||
                 'บันทึกข้อมูลไม่สำเร็จ'
+
               )
             );
 
@@ -1529,11 +1660,15 @@ function callAPI(
 
           reject(
             new Error(
-              'โหลด Apps Script ไม่สำเร็จ'
+              'เชื่อมต่อ Apps Script ไม่สำเร็จ'
             )
           );
 
         };
+
+
+      script.async =
+        true;
 
 
       script.src =
@@ -1575,7 +1710,7 @@ async function onScanSuccess(
 
 
   /*
-   * กัน QR เดิมยิงซ้ำ
+   * ป้องกัน QR เดิมยิงซ้ำ
    */
 
   if (
@@ -1604,14 +1739,14 @@ async function onScanSuccess(
 
 
   /*
-   * หยุดกล้องก่อน
+   * หยุดกล้อง
    */
 
   await stopCamera();
 
 
   /*
-   * แสดงว่าอ่าน QR แล้วทันที
+   * แสดงผลทันทีว่าอ่าน QR แล้ว
    */
 
   resultBox.style.display =
@@ -1662,16 +1797,8 @@ async function onScanSuccess(
 
   try {
 
-
     /*
-     * ส่งไป Apps Script
-     *
-     * ตัว Backend รองรับ:
-     *
-     * action
-     * branch
-     * device
-     * payload
+     * ส่ง Apps Script
      */
 
     const data =
@@ -1787,7 +1914,9 @@ async function onScanSuccess(
 
 
     setStatus(
+
       data.message ||
+
       (
         data.direction ===
         'IN'
@@ -1803,13 +1932,15 @@ async function onScanSuccess(
       ),
 
       'success'
+
     );
 
 
     beep(true);
 
 
-  } catch(error) {
+  }
+  catch(error) {
 
     console.error(
       'SCAN ERROR:',
@@ -1847,12 +1978,15 @@ async function onScanSuccess(
 
 
     setStatus(
+
       '❌ ' +
       (
         error.message ||
         error
       ),
+
       'error'
+
     );
 
 
@@ -1892,6 +2026,7 @@ async function scanAgain() {
   lastQR =
     '';
 
+
   lastQRTime =
     0;
 
@@ -1907,7 +2042,7 @@ async function scanAgain() {
 
 window.addEventListener(
   'load',
-  function() {
+  async function() {
 
     if (
       typeof Html5Qrcode ===
@@ -1919,18 +2054,52 @@ window.addEventListener(
         'error'
       );
 
+
       return;
 
     }
 
 
     setStatus(
-      'พร้อมเปิดกล้อง',
-      'info'
+      '⏳ กำลังตรวจสอบการเชื่อมต่อ...',
+      'loading'
     );
 
 
     updateButtons();
+
+
+    /*
+     * ตรวจสอบ Apps Script
+     */
+
+    try {
+
+      await callAPI(
+        'ping'
+      );
+
+
+      setStatus(
+        '🟢 ระบบพร้อม — เชื่อมต่อ Apps Script แล้ว',
+        'success'
+      );
+
+    }
+    catch(error) {
+
+      console.error(
+        'Backend ping error:',
+        error
+      );
+
+
+      setStatus(
+        '⚠️ กล้องพร้อมใช้งาน แต่ยังเชื่อมต่อ Apps Script ไม่ได้',
+        'error'
+      );
+
+    }
 
   }
 );
@@ -1951,7 +2120,7 @@ window.addEventListener(
 
       scanner.stop()
         .catch(
-          () => {}
+          function() {}
         );
 
     }
