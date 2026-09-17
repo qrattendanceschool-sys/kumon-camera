@@ -1014,7 +1014,14 @@ async function onScanSuccess(
         }
 
       );
+const data =
+  response;
 
+if (!data) {
+  throw new Error(
+    'Apps Script ไม่ส่งข้อมูลกลับมา'
+  );
+}
 
     const data =
       response;
