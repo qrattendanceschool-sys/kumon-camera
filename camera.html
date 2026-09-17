@@ -1,356 +1,921 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
+
   <meta charset="UTF-8">
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Kumon Central Korat - QR Attendance</title>
+  <title>QR Attendance - Kumon</title>
 
-  <!-- QR Scanner -->
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <!-- =====================================================
+       QR SCANNER
+  ====================================================== -->
+
+  <script
+    src="https://unpkg.com/html5-qrcode"
+  ></script>
+
 
   <style>
+
+    :root {
+      --bg: #f7f8fa;
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --primary: #2563eb;
+      --danger: #ef4444;
+      --success: #059669;
+      --warning: #d97706;
+      --muted: #6b7280;
+      --text: #111827;
+    }
+
+
     * {
       box-sizing: border-box;
     }
 
+
     body {
+
       margin: 0;
-      padding: 20px;
-      background: #f5f6fa;
+
+      background:
+        var(--bg);
+
+      color:
+        var(--text);
+
       font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
         Arial,
-        "Noto Sans Thai",
-        "Tahoma",
         sans-serif;
-      color: #111827;
+
     }
 
-    .container {
-      width: 100%;
-      max-width: 1050px;
-      margin: auto;
+
+    .wrap {
+
+      width:
+        min(1200px, 94%);
+
+      margin:
+        auto;
+
+      padding:
+        18px 0 40px;
+
     }
+
 
     .card {
-      background: white;
-      border-radius: 24px;
-      padding: 26px;
-      margin-bottom: 20px;
-      box-shadow: 0 8px 25px rgba(0,0,0,.07);
+
+      background:
+        var(--card);
+
+      border:
+        1px solid var(--border);
+
+      border-radius:
+        18px;
+
+      padding:
+        20px;
+
+      margin:
+        14px 0;
+
+      box-shadow:
+        0 2px 8px rgba(0,0,0,.05);
+
     }
 
-    .header {
-      text-align: center;
+
+    /* =====================================================
+       HEADER
+    ====================================================== */
+
+    .brand {
+
+      text-align:
+        center;
+
     }
 
-    .title {
-      font-size: 38px;
-      font-weight: 800;
-      margin-bottom: 10px;
+
+    .brand h1 {
+
+      margin:
+        0;
+
+      font-size:
+        32px;
+
+      font-weight:
+        800;
+
     }
+
 
     .subtitle {
-      font-size: 25px;
-      font-weight: 600;
-      color: #6b7280;
-      margin-bottom: 14px;
+
+      margin-top:
+        7px;
+
+      color:
+        var(--muted);
+
+      font-size:
+        18px;
+
     }
 
-    .branch {
-      font-size: 20px;
-      font-weight: 700;
-      color: #374151;
+
+    .system-info {
+
+      margin-top:
+        12px;
+
+      font-weight:
+        700;
+
+      font-size:
+        17px;
+
     }
 
-    /* CAMERA */
 
-    .camera-card {
-      padding: 20px;
-    }
-
-    #reader {
-      width: 100%;
-      min-height: 420px;
-      background: #111827;
-      border-radius: 22px;
-      overflow: hidden;
-    }
-
-    #cameraMessage {
-      min-height: 420px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: #d1d5db;
-      font-size: 22px;
-      font-weight: 700;
-      padding: 30px;
-    }
-
-    /* STATUS */
+    /* =====================================================
+       STATUS
+    ====================================================== */
 
     .status {
-      border-radius: 18px;
-      padding: 18px;
-      text-align: center;
-      font-size: 21px;
-      font-weight: 700;
-      margin-bottom: 18px;
+
+      text-align:
+        center;
+
+      padding:
+        14px;
+
+      border-radius:
+        12px;
+
+      margin-top:
+        14px;
+
+      font-weight:
+        800;
+
     }
 
-    .status.ok {
-      background: #dcfce7;
-      color: #166534;
+
+    .status.success {
+
+      background:
+        #dcfce7;
+
+      color:
+        #166534;
+
     }
+
 
     .status.error {
-      background: #fee2e2;
-      color: #991b1b;
+
+      background:
+        #fee2e2;
+
+      color:
+        #991b1b;
+
     }
+
 
     .status.warning {
-      background: #fef3c7;
-      color: #92400e;
+
+      background:
+        #fef3c7;
+
+      color:
+        #92400e;
+
     }
+
 
     .status.info {
-      background: #dbeafe;
-      color: #1e40af;
+
+      background:
+        #dbeafe;
+
+      color:
+        #1e40af;
+
     }
 
-    /* RESULT */
 
-    .result {
-      border-radius: 20px;
-      padding: 24px;
-      margin-bottom: 20px;
-      border: 1px solid #e5e7eb;
+    /* =====================================================
+       CAMERA
+    ====================================================== */
+
+    #scanner {
+
+      width:
+        100%;
+
+      min-height:
+        420px;
+
+      background:
+        #111;
+
+      border-radius:
+        16px;
+
+      overflow:
+        hidden;
+
     }
 
-    .result.success {
-      background: #f0fdf4;
-      border-color: #86efac;
+
+    #scanner video {
+
+      width:
+        100% !important;
+
+      height:
+        auto !important;
+
+      display:
+        block;
+
     }
 
-    .result.error {
-      background: #fff7f7;
-      border-color: #fca5a5;
+
+    .camera-status {
+
+      text-align:
+        center;
+
+      color:
+        var(--muted);
+
+      padding-top:
+        12px;
+
+      font-size:
+        16px;
+
     }
 
-    .result-title {
-      font-size: 28px;
-      font-weight: 800;
-      margin-bottom: 16px;
+
+    /* =====================================================
+       BUTTONS
+    ====================================================== */
+
+    .controls {
+
+      display:
+        flex;
+
+      justify-content:
+        center;
+
+      align-items:
+        center;
+
+      gap:
+        12px;
+
+      flex-wrap:
+        wrap;
+
     }
 
-    .result-row {
-      background: #f3f4f6;
-      border-radius: 12px;
-      padding: 13px 16px;
-      margin-bottom: 10px;
-      font-size: 18px;
-    }
-
-    /* BUTTONS */
-
-    .buttons {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
 
     button {
-      border: 0;
-      border-radius: 15px;
-      padding: 18px 12px;
-      font-size: 20px;
-      font-weight: 800;
-      cursor: pointer;
-      min-height: 65px;
+
+      border:
+        1px solid var(--border);
+
+      background:
+        white;
+
+      padding:
+        14px 24px;
+
+      border-radius:
+        12px;
+
+      cursor:
+        pointer;
+
+      font-size:
+        17px;
+
+      font-weight:
+        700;
+
     }
+
+
+    button.primary {
+
+      background:
+        var(--primary);
+
+      color:
+        white;
+
+      border-color:
+        var(--primary);
+
+    }
+
+
+    button.danger {
+
+      background:
+        var(--danger);
+
+      color:
+        white;
+
+      border-color:
+        var(--danger);
+
+    }
+
 
     button:disabled {
-      opacity: .45;
-      cursor: not-allowed;
+
+      opacity:
+        .45;
+
+      cursor:
+        not-allowed;
+
     }
 
-    .btn-start {
-      background: #2563eb;
-      color: white;
+
+    /* =====================================================
+       RESULT
+    ====================================================== */
+
+    .result {
+
+      min-height:
+        80px;
+
+      text-align:
+        center;
+
+      padding:
+        22px;
+
+      font-size:
+        20px;
+
     }
 
-    .btn-stop {
-      background: #ef4444;
-      color: white;
+
+    .result.success {
+
+      color:
+        var(--success);
+
+      font-weight:
+        800;
+
     }
 
-    .btn-switch {
-      background: #6b7280;
-      color: white;
+
+    .result.error {
+
+      color:
+        #b00020;
+
+      font-weight:
+        800;
+
     }
 
-    .btn-next {
-      width: 100%;
-      background: #16a34a;
-      color: white;
-      margin-top: 10px;
+
+    .student-name {
+
+      font-size:
+        32px;
+
+      font-weight:
+        900;
+
+      margin-bottom:
+        10px;
+
     }
 
-    /* DEBUG */
 
-    .debug {
-      background: #111827;
-      color: #d1d5db;
-      border-radius: 15px;
-      padding: 15px;
-      font-family: monospace;
-      font-size: 13px;
-      white-space: pre-wrap;
-      word-break: break-word;
-      display: none;
+    .direction {
+
+      font-size:
+        28px;
+
+      font-weight:
+        900;
+
+      margin-bottom:
+        8px;
+
     }
+
+
+    .detail {
+
+      font-size:
+        18px;
+
+      margin:
+        5px 0;
+
+    }
+
+
+    .raw {
+
+      margin-top:
+        12px;
+
+      color:
+        var(--muted);
+
+      font-size:
+        14px;
+
+      word-break:
+        break-all;
+
+    }
+
+
+    /* =====================================================
+       BOARD
+    ====================================================== */
+
+    .grid {
+
+      display:
+        grid;
+
+      grid-template-columns:
+        1fr;
+
+      gap:
+        18px;
+
+    }
+
+
+    @media (min-width: 900px) {
+
+      .grid {
+
+        grid-template-columns:
+          1fr 1fr;
+
+      }
+
+    }
+
+
+    .board h3 {
+
+      margin:
+        0 0 12px;
+
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      gap:
+        8px;
+
+    }
+
+
+    .count {
+
+      font-size:
+        13px;
+
+      color:
+        var(--muted);
+
+      border:
+        1px solid var(--border);
+
+      border-radius:
+        999px;
+
+      padding:
+        4px 10px;
+
+    }
+
+
+    .list {
+
+      display:
+        grid;
+
+      gap:
+        9px;
+
+    }
+
+
+    .item {
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
+
+      gap:
+        12px;
+
+      border:
+        1px solid var(--border);
+
+      border-radius:
+        12px;
+
+      padding:
+        12px;
+
+    }
+
+
+    .status-over {
+
+      background:
+        #fee2e2;
+
+      border-color:
+        #fecaca;
+
+    }
+
+
+    .name {
+
+      font-weight:
+        700;
+
+    }
+
+
+    .meta {
+
+      color:
+        var(--muted);
+
+      font-size:
+        13px;
+
+      margin-top:
+        3px;
+
+    }
+
+
+    /* =====================================================
+       DEBUG
+    ====================================================== */
+
+    #debug {
+
+      display:
+        none;
+
+      margin-top:
+        12px;
+
+      padding:
+        14px;
+
+      background:
+        #111827;
+
+      color:
+        #d1d5db;
+
+      border-radius:
+        12px;
+
+      font-family:
+        monospace;
+
+      font-size:
+        13px;
+
+      white-space:
+        pre-wrap;
+
+      word-break:
+        break-word;
+
+    }
+
+
+    /* =====================================================
+       MOBILE
+    ====================================================== */
 
     @media (max-width: 700px) {
 
-      body {
-        padding: 10px;
+      .wrap {
+
+        width:
+          96%;
+
       }
 
-      .card {
-        padding: 16px;
-        border-radius: 18px;
+
+      .brand h1 {
+
+        font-size:
+          27px;
+
       }
 
-      .title {
-        font-size: 27px;
-      }
 
       .subtitle {
-        font-size: 19px;
+
+        font-size:
+          16px;
+
       }
 
-      .branch {
-        font-size: 15px;
+
+      .system-info {
+
+        font-size:
+          14px;
+
       }
 
-      #reader,
-      #cameraMessage {
-        min-height: 330px;
+
+      #scanner {
+
+        min-height:
+          320px;
+
       }
 
-      .buttons {
-        grid-template-columns: 1fr;
-      }
 
       button {
-        font-size: 18px;
+
+        width:
+          100%;
+
       }
+
+
+      .student-name {
+
+        font-size:
+          27px;
+
+      }
+
+
+      .direction {
+
+        font-size:
+          24px;
+
+      }
+
     }
+
   </style>
+
 </head>
+
 
 <body>
 
-<div class="container">
 
-  <!-- HEADER -->
+<div class="wrap">
 
-  <div class="card header">
 
-    <div class="title">
-      📷 Kumon Central Korat
-    </div>
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <div class="card brand">
+
+    <h1>
+      Kumon Center
+    </h1>
 
     <div class="subtitle">
-      สแกน QR เข้า–ออก
+      สแกน QR เข้า–ออก |
+      วิชา: เลข / อังกฤษ / ไทย
     </div>
 
-    <div class="branch">
-      Branch: <span id="branchText">B001</span>
-      |
-      สาขาหลัก
-      |
-      Device: <span id="deviceText">B001-01</span>
+    <div
+      id="system-info"
+      class="system-info"
+    >
+      กำลังเชื่อมต่อระบบ...
     </div>
 
-  </div>
-
-
-  <!-- CAMERA -->
-
-  <div class="card camera-card">
-
-    <div id="reader">
-
-      <div id="cameraMessage">
-        📷 กด "เปิดกล้อง" เพื่อเริ่มสแกน
-      </div>
-
+    <div
+      id="api-status"
+      class="status warning"
+    >
+      ⏳ กำลังตรวจสอบ Apps Script...
     </div>
 
   </div>
 
 
-  <!-- API STATUS -->
-
-  <div id="apiStatus" class="status warning">
-    ⏳ กำลังตรวจสอบการเชื่อมต่อ Apps Script...
-  </div>
-
-
-  <!-- RESULT -->
-
-  <div id="resultBox" style="display:none;"></div>
-
-
-  <!-- BUTTONS -->
+  <!-- =====================================================
+       CAMERA
+  ====================================================== -->
 
   <div class="card">
 
-    <div class="buttons">
+    <div id="scanner"></div>
 
-      <button
-        id="startBtn"
-        class="btn-start"
-        onclick="startCamera()"
-      >
-        📷 เปิดกล้อง
-      </button>
-
-      <button
-        id="stopBtn"
-        class="btn-stop"
-        onclick="stopCamera()"
-        disabled
-      >
-        ⛔ ปิดกล้อง
-      </button>
-
-      <button
-        id="switchBtn"
-        class="btn-switch"
-        onclick="switchCamera()"
-        disabled
-      >
-        🔄 สลับกล้อง
-      </button>
-
+    <div
+      id="camera-status"
+      class="camera-status"
+    >
+      กล้อง: ยังไม่ได้เปิด
     </div>
 
   </div>
 
 
-  <!-- DEBUG -->
+  <!-- =====================================================
+       CONTROLS
+  ====================================================== -->
 
-  <div id="debug" class="debug"></div>
+  <div class="card controls">
+
+    <button
+      id="btn-start"
+      class="primary"
+      onclick="startScan()"
+    >
+      📷 เริ่มสแกน
+    </button>
+
+
+    <button
+      id="btn-stop"
+      class="danger"
+      onclick="stopScan()"
+      disabled
+    >
+      ⛔ หยุดสแกน
+    </button>
+
+
+    <button
+      id="btn-switch"
+      onclick="switchCamera()"
+      disabled
+    >
+      🔄 สลับกล้อง
+    </button>
+
+  </div>
+
+
+  <!-- =====================================================
+       RESULT
+  ====================================================== -->
+
+  <div
+    id="result"
+    class="card result"
+  >
+
+    พร้อมสแกน —
+    กด "เริ่มสแกน"
+
+  </div>
+
+
+  <!-- =====================================================
+       STATUS BOARD
+  ====================================================== -->
+
+  <div class="grid">
+
+
+    <!-- MATH -->
+
+    <div class="board card">
+
+      <h3>
+
+        กำลังเรียน:
+        ห้องเลข (MATH)
+
+        <span
+          id="count-math"
+          class="count"
+        >
+          0 คน
+        </span>
+
+      </h3>
+
+
+      <div
+        id="list-math"
+        class="list"
+      ></div>
+
+    </div>
+
+
+    <!-- LANGUAGE -->
+
+    <div class="board card">
+
+      <h3>
+
+        กำลังเรียน:
+        ห้องภาษา (ENG + TRP + EFL)
+
+        <span
+          id="count-lang"
+          class="count"
+        >
+          0 คน
+        </span>
+
+      </h3>
+
+
+      <div
+        id="list-lang"
+        class="list"
+      ></div>
+
+    </div>
+
+
+  </div>
+
+
+  <!-- =====================================================
+       DEBUG
+  ====================================================== -->
+
+  <div
+    id="debug"
+  ></div>
+
 
 </div>
+
+
+<!-- =======================================================
+     SOUND
+======================================================== -->
+
+<audio
+  id="beep"
+  src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
+  preload="auto"
+></audio>
+
+
+<audio
+  id="squeak"
+  src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"
+  preload="auto"
+></audio>
 
 
 <script>
@@ -359,1050 +924,147 @@
    CONFIG
 ========================================================= */
 
-const APPS_SCRIPT_URL =
+const API_URL =
   "https://script.google.com/macros/s/AKfycbx1pn5AbJYph_x7ZBSC2vVoQV-_fi7BlaHmuzT3uunl6i3wHpQTMJE7rHhyrQmKG1GbiQ/exec";
 
-const BRANCH_ID = "B001";
 
-const DEVICE_ID = "B001-01";
+const BRANCH_ID =
+  "B001";
+
+
+const DEVICE_ID =
+  "B001-01";
 
 
 /* =========================================================
-   VARIABLES
+   CAMERA CONFIG
 ========================================================= */
 
-let scanner = null;
+const SCAN_FPS =
+  10;
 
-let cameraRunning = false;
 
-let currentCameraId = null;
+const QR_BOX =
+  250;
 
-let cameras = [];
 
-let lastScannedText = "";
+const LS_KEY_ID =
+  "qr_last_device_id";
 
-let lastScanTime = 0;
 
-let apiReady = false;
+const LS_KEY_FACING =
+  "qr_last_facing";
 
-let requestCounter = 0;
+
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
+
+let qr =
+  null;
+
+
+let busy =
+  false;
+
+
+let isStarting =
+  false;
+
+
+let isStopping =
+  false;
+
+
+let cameraRunning =
+  false;
+
+
+let cameras =
+  [];
+
+
+let currentCameraId =
+  null;
+
+
+let currentFacing =
+  "environment";
+
+
+let callbackCounter =
+  0;
 
 
 /* =========================================================
    ELEMENTS
 ========================================================= */
 
-const apiStatus =
-  document.getElementById("apiStatus");
-
-const resultBox =
-  document.getElementById("resultBox");
-
-const debugBox =
-  document.getElementById("debug");
-
-const startBtn =
-  document.getElementById("startBtn");
-
-const stopBtn =
-  document.getElementById("stopBtn");
-
-const switchBtn =
-  document.getElementById("switchBtn");
-
-
-/* =========================================================
-   BASIC UI
-========================================================= */
-
-function setApiStatus(type, text) {
-
-  apiStatus.className =
-    "status " + type;
-
-  apiStatus.textContent =
-    text;
-}
-
-
-function showDebug(text) {
-
-  debugBox.style.display = "block";
-
-  debugBox.textContent =
-    text;
-}
-
-
-function hideDebug() {
-
-  debugBox.style.display = "none";
-
-}
-
-
-/* =========================================================
-   JSONP
-========================================================= */
-
-/*
-   สำคัญมาก
-
-   GitHub Pages กับ Apps Script
-   อยู่คนละ domain
-
-   เราจึงไม่ใช้ fetch()
-
-   แต่ใช้ JSONP ผ่าน <script>
-*/
-
-function callAppsScript(params, timeout = 10000) {
-
-  return new Promise((resolve, reject) => {
-
-    const callbackName =
-      "__qr_callback_" +
-      Date.now() +
-      "_" +
-      (++requestCounter);
-
-    const script =
-      document.createElement("script");
-
-    let finished = false;
-
-    const timer =
-      setTimeout(() => {
-
-        if (finished) return;
-
-        finished = true;
-
-        cleanup();
-
-        reject(
-          new Error(
-            "Apps Script ไม่ตอบกลับภายใน " +
-            timeout +
-            " ms"
-          )
-        );
-
-      }, timeout);
-
-
-    function cleanup() {
-
-      clearTimeout(timer);
-
-      try {
-        delete window[callbackName];
-      } catch (e) {
-        window[callbackName] =
-          undefined;
-      }
-
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-
-    }
-
-
-    window[callbackName] =
-      function(data) {
-
-        if (finished) return;
-
-        finished = true;
-
-        cleanup();
-
-        resolve(data);
-
-      };
-
-
-    const query =
-      new URLSearchParams();
-
-    Object.keys(params).forEach(key => {
-
-      if (
-        params[key] !== undefined &&
-        params[key] !== null
-      ) {
-
-        query.set(
-          key,
-          params[key]
-        );
-
-      }
-
-    });
-
-
-    query.set(
-      "callback",
-      callbackName
-    );
-
-
-    script.src =
-      APPS_SCRIPT_URL +
-      "?" +
-      query.toString();
-
-
-    script.onerror =
-      function() {
-
-        if (finished) return;
-
-        finished = true;
-
-        cleanup();
-
-        reject(
-          new Error(
-            "ไม่สามารถโหลด Apps Script ได้"
-          )
-        );
-
-      };
-
-
-    document.head.appendChild(script);
-
-  });
-
-}
-
-
-/* =========================================================
-   TEST APPS SCRIPT
-========================================================= */
-
-async function testAppsScript() {
-
-  setApiStatus(
-    "warning",
-    "⏳ กำลังเชื่อมต่อ Apps Script..."
-  );
-
-
-  try {
-
-    const result =
-      await callAppsScript({
-        action: "ping"
-      });
-
-
-    console.log(
-      "PING RESULT",
-      result
-    );
-
-
-    if (
-      result &&
-      result.success === true
-    ) {
-
-      apiReady = true;
-
-      setApiStatus(
-        "ok",
-        "✅ เชื่อมต่อ Apps Script สำเร็จ"
-      );
-
-      hideDebug();
-
-      return true;
-
-    }
-
-
-    apiReady = false;
-
-    setApiStatus(
-      "error",
-      "❌ Apps Script ตอบกลับ แต่ข้อมูลไม่ถูกต้อง"
-    );
-
-    showDebug(
-      JSON.stringify(
-        result,
-        null,
-        2
-      )
-    );
-
-    return false;
-
-
-  } catch (error) {
-
-    apiReady = false;
-
-    setApiStatus(
-      "error",
-      "❌ เชื่อมต่อ Apps Script ไม่สำเร็จ: " +
-      error.message
-    );
-
-
-    showDebug(
-      "URL:\n" +
-      APPS_SCRIPT_URL +
-      "\n\nERROR:\n" +
-      error.message
-    );
-
-
-    console.error(error);
-
-    return false;
-
-  }
-
-}
-
-
-/* =========================================================
-   CAMERA LIST
-========================================================= */
-
-async function loadCameras() {
-
-  try {
-
-    cameras =
-      await Html5Qrcode
-        .getCameras();
-
-
-    if (
-      !cameras ||
-      cameras.length === 0
-    ) {
-
-      throw new Error(
-        "ไม่พบกล้องในอุปกรณ์"
-      );
-
-    }
-
-
-    /*
-       เลือกกล้องหลังเป็นค่าเริ่มต้น
-    */
-
-    let backCamera =
-      cameras.find(camera =>
-        /back|rear|environment/i
-          .test(camera.label)
-      );
-
-
-    currentCameraId =
-      backCamera
-        ? backCamera.id
-        : cameras[0].id;
-
-
-    switchBtn.disabled =
-      cameras.length < 2;
-
-
-    return true;
-
-
-  } catch (error) {
-
-    setApiStatus(
-      "error",
-      "❌ ไม่สามารถเข้าถึงกล้อง: " +
-      error.message
-    );
-
-
-    showDebug(
-      "CAMERA ERROR:\n" +
-      error.message
-    );
-
-
-    return false;
-
-  }
-
-}
-
-
-/* =========================================================
-   START CAMERA
-========================================================= */
-
-async function startCamera() {
-
-  if (cameraRunning) {
-
-    return;
-
-  }
-
-
-  /*
-     ตรวจ API ก่อน
-  */
-
-  if (!apiReady) {
-
-    const ok =
-      await testAppsScript();
-
-    if (!ok) {
-
-      return;
-
-    }
-
-  }
-
-
-  /*
-     ขอสิทธิ์ / โหลดกล้อง
-  */
-
-  const camerasOK =
-    await loadCameras();
-
-  if (!camerasOK) {
-
-    return;
-
-  }
-
-
-  try {
-
-    if (!scanner) {
-
-      scanner =
-        new Html5Qrcode(
-          "reader"
-        );
-
-    }
-
-
-    document.getElementById(
-      "cameraMessage"
-    ).style.display =
-      "none";
-
-
-    await scanner.start(
-
-      currentCameraId,
-
-      {
-        fps: 10,
-
-        qrbox: function(
-          width,
-          height
-        ) {
-
-          const size =
-            Math.min(
-              width,
-              height
-            ) * 0.70;
-
-          return {
-            width: size,
-            height: size
-          };
-
-        },
-
-        aspectRatio: 1.0
-
-      },
-
-      onQrSuccess,
-
-      onQrError
-
-    );
-
-
-    cameraRunning = true;
-
-
-    startBtn.disabled = true;
-
-    stopBtn.disabled = false;
-
-    switchBtn.disabled =
-      cameras.length < 2;
-
-
-    setApiStatus(
-      "ok",
-      "📷 กล้องพร้อมใช้งาน — กรุณานำ QR มาให้กล้องอ่าน"
-    );
-
-
-  } catch (error) {
-
-    cameraRunning = false;
-
-    startBtn.disabled = false;
-
-    stopBtn.disabled = true;
-
-    switchBtn.disabled = true;
-
-
-    let message =
-      error &&
-      error.message
-        ? error.message
-        : String(error);
-
-
-    setApiStatus(
-      "error",
-      "❌ เปิดกล้องไม่สำเร็จ: " +
-      message
-    );
-
-
-    showDebug(
-      "START CAMERA ERROR:\n" +
-      message
-    );
-
-
-    console.error(
-      "START CAMERA ERROR",
-      error
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   STOP CAMERA
-========================================================= */
-
-async function stopCamera() {
-
-  if (!scanner) {
-
-    return;
-
-  }
-
-
-  try {
-
-    if (cameraRunning) {
-
-      await scanner.stop();
-
-    }
-
-
-  } catch (error) {
-
-    console.warn(
-      "STOP CAMERA",
-      error
-    );
-
-  }
-
-
-  cameraRunning = false;
-
-
-  startBtn.disabled = false;
-
-  stopBtn.disabled = true;
-
-  switchBtn.disabled =
-    cameras.length < 2;
-
-
+const resultEl =
   document.getElementById(
-    "cameraMessage"
-  ).style.display =
-    "flex";
-
-
-  setApiStatus(
-    apiReady
-      ? "ok"
-      : "warning",
-    apiReady
-      ? "✅ เชื่อมต่อ Apps Script แล้ว"
-      : "⚠️ ยังไม่ได้เชื่อมต่อ Apps Script"
-  );
-
-}
-
-
-/* =========================================================
-   SWITCH CAMERA
-========================================================= */
-
-async function switchCamera() {
-
-  if (
-    !scanner ||
-    !cameraRunning ||
-    cameras.length < 2
-  ) {
-
-    return;
-
-  }
-
-
-  try {
-
-    await scanner.stop();
-
-  } catch (e) {
-
-    console.warn(e);
-
-  }
-
-
-  const index =
-    cameras.findIndex(
-      camera =>
-        camera.id ===
-        currentCameraId
-    );
-
-
-  const nextIndex =
-    (index + 1) %
-    cameras.length;
-
-
-  currentCameraId =
-    cameras[nextIndex].id;
-
-
-  try {
-
-    await scanner.start(
-
-      currentCameraId,
-
-      {
-        fps: 10,
-
-        qrbox: function(
-          width,
-          height
-        ) {
-
-          const size =
-            Math.min(
-              width,
-              height
-            ) * 0.70;
-
-          return {
-            width: size,
-            height: size
-          };
-
-        }
-
-      },
-
-      onQrSuccess,
-
-      onQrError
-
-    );
-
-
-  } catch (error) {
-
-    setApiStatus(
-      "error",
-      "❌ สลับกล้องไม่สำเร็จ: " +
-      error.message
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   QR SUCCESS
-========================================================= */
-
-async function onQrSuccess(
-  decodedText,
-  decodedResult
-) {
-
-  const now =
-    Date.now();
-
-
-  /*
-     ป้องกัน QR เดิมยิงซ้ำเร็วเกินไป
-  */
-
-  if (
-    decodedText ===
-    lastScannedText &&
-    now - lastScanTime <
-    3000
-  ) {
-
-    return;
-
-  }
-
-
-  lastScannedText =
-    decodedText;
-
-  lastScanTime =
-    now;
-
-
-  console.log(
-    "QR:",
-    decodedText
+    "result"
   );
 
 
-  /*
-     ตรวจรูปแบบ
-
-     ตัวอย่าง:
-     18040#MATH
-  */
-
-  const payload =
-    decodedText.trim();
-
-
-  if (!payload) {
-
-    return;
-
-  }
-
-
-  setApiStatus(
-    "info",
-    "⏳ อ่าน QR แล้ว กำลังบันทึกข้อมูล..."
+const apiStatus =
+  document.getElementById(
+    "api-status"
   );
 
 
-  try {
-
-    const result =
-      await callAppsScript({
-
-        action: "scan",
-
-        branch: BRANCH_ID,
-
-        device: DEVICE_ID,
-
-        payload: payload
-
-      });
-
-
-    console.log(
-      "SCAN RESULT",
-      result
-    );
-
-
-    if (
-      result &&
-      result.success === true
-    ) {
-
-      showSuccess(
-        result,
-        payload
-      );
-
-
-      setApiStatus(
-        "ok",
-        "✅ บันทึกข้อมูลสำเร็จ"
-      );
-
-
-    } else {
-
-      showError(
-        result,
-        payload
-      );
-
-
-      setApiStatus(
-        "error",
-        "❌ " +
-        (
-          result &&
-          result.error
-            ? result.error
-            : "ไม่สามารถบันทึกข้อมูลได้"
-        )
-      );
-
-    }
-
-
-  } catch (error) {
-
-    console.error(
-      "SCAN ERROR",
-      error
-    );
-
-
-    showError(
-      {
-        error:
-          error.message
-      },
-      payload
-    );
-
-
-    setApiStatus(
-      "error",
-      "❌ เรียก Apps Script ไม่สำเร็จ: " +
-      error.message
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   QR ERROR
-========================================================= */
-
-function onQrError(
-  errorMessage
-) {
-
-  /*
-     ไม่ต้องแสดงทุก frame
-     เพราะ scanner จะยิง error
-     ขณะยังหา QR ไม่เจอ
-  */
-
-}
-
-
-/* =========================================================
-   SUCCESS RESULT
-========================================================= */
-
-function showSuccess(
-  result,
-  payload
-) {
-
-  resultBox.style.display =
-    "block";
-
-
-  resultBox.className =
-    "result success";
-
-
-  const direction =
-    result.direction || "";
-
-
-  const directionText =
-    direction === "IN"
-      ? "เข้าเรียน"
-      : direction === "OUT"
-        ? "ออกเรียน"
-        : direction;
-
-
-  resultBox.innerHTML =
-
-    "<div class='result-title'>" +
-
-      "✅ " +
-      escapeHtml(
-        result.message ||
-        "ดำเนินการสำเร็จ"
-      ) +
-
-    "</div>" +
-
-    "<div class='result-row'>" +
-      "👤 นักเรียน: " +
-      escapeHtml(
-        result.fullName ||
-        "-"
-      ) +
-    "</div>" +
-
-    "<div class='result-row'>" +
-      "🆔 รหัส: " +
-      escapeHtml(
-        result.studentId ||
-        "-"
-      ) +
-    "</div>" +
-
-    "<div class='result-row'>" +
-      "📚 วิชา: " +
-      escapeHtml(
-        result.subject ||
-        "-"
-      ) +
-    "</div>" +
-
-    "<div class='result-row'>" +
-      "🚪 รายการ: " +
-      escapeHtml(
-        directionText
-      ) +
-    "</div>" +
-
-    "<div class='result-row'>" +
-      "🕐 เวลา: " +
-      escapeHtml(
-        result.time ||
-        "-"
-      ) +
-    "</div>" +
-
-    "<button " +
-      "class='btn-next' " +
-      "onclick='clearResult()'>" +
-
-      "🔎 สแกนคนถัดไป" +
-
-    "</button>";
-
-}
-
-
-/* =========================================================
-   ERROR RESULT
-========================================================= */
-
-function showError(
-  result,
-  payload
-) {
-
-  resultBox.style.display =
-    "block";
-
-
-  resultBox.className =
-    "result error";
-
-
-  const message =
-    result &&
-    result.error
-      ? result.error
-      : "ไม่สามารถบันทึกข้อมูลได้";
-
-
-  resultBox.innerHTML =
-
-    "<div class='result-title'>" +
-
-      "❌ " +
-      escapeHtml(
-        message
-      ) +
-
-    "</div>" +
-
-    "<div class='result-row'>" +
-      "QR: " +
-      escapeHtml(
-        payload
-      ) +
-    "</div>" +
-
-    "<button " +
-      "class='btn-next' " +
-      "onclick='clearResult()'>" +
-
-      "🔎 ลองสแกนอีกครั้ง" +
-
-    "</button>";
-
-}
-
-
-/* =========================================================
-   CLEAR RESULT
-========================================================= */
-
-function clearResult() {
-
-  resultBox.style.display =
-    "none";
-
-  resultBox.innerHTML = "";
-
-  lastScannedText = "";
-
-  lastScanTime = 0;
-
-
-  setApiStatus(
-    "ok",
-    "📷 พร้อมสแกนคนถัดไป"
+const cameraStatus =
+  document.getElementById(
+    "camera-status"
   );
 
-}
+
+const btnStart =
+  document.getElementById(
+    "btn-start"
+  );
+
+
+const btnStop =
+  document.getElementById(
+    "btn-stop"
+  );
+
+
+const btnSwitch =
+  document.getElementById(
+    "btn-switch"
+  );
+
+
+const systemInfo =
+  document.getElementById(
+    "system-info"
+  );
+
+
+const beep =
+  document.getElementById(
+    "beep"
+  );
+
+
+const squeak =
+  document.getElementById(
+    "squeak"
+  );
 
 
 /* =========================================================
    HTML ESCAPE
 ========================================================= */
 
-function escapeHtml(
-  value
-) {
+function escapeHtml(value) {
 
-  return String(value)
+  return String(
+    value == null
+      ? ""
+      : value
+  )
     .replace(
       /&/g,
       "&amp;"
@@ -1428,45 +1090,1851 @@ function escapeHtml(
 
 
 /* =========================================================
-   INITIALIZE
+   STATUS
+========================================================= */
+
+function setStatus(
+  message,
+  type
+) {
+
+  apiStatus.className =
+    "status " +
+    type;
+
+  apiStatus.textContent =
+    message;
+
+}
+
+
+/* =========================================================
+   RESULT
+========================================================= */
+
+function showError(
+  message
+) {
+
+  resultEl.className =
+    "card result error";
+
+  resultEl.innerHTML =
+    "❌ " +
+    escapeHtml(
+      message
+    );
+
+}
+
+
+function showOK(
+  data
+) {
+
+  const direction =
+    data.direction === "IN"
+      ? "🟢 CHECK-IN"
+      : data.direction === "OUT"
+        ? "🔴 CHECK-OUT"
+        : data.direction || "";
+
+
+  const duration =
+    data.durationMin !== "" &&
+    data.durationMin !== null &&
+    data.durationMin !== undefined
+      ? "เวลาเรียน: " +
+        data.durationMin +
+        " นาที"
+      : "";
+
+
+  const flag =
+    data.flag
+      ? " ⏰ " +
+        data.flag
+      : "";
+
+
+  resultEl.className =
+    "card result success";
+
+
+  resultEl.innerHTML =
+
+    "<div class='student-name'>" +
+
+      escapeHtml(
+        data.fullName ||
+        data.studentId ||
+        "-"
+      ) +
+
+    "</div>" +
+
+
+    "<div class='direction'>" +
+
+      escapeHtml(
+        direction
+      ) +
+
+    "</div>" +
+
+
+    "<div class='detail'>" +
+
+      "รหัส: " +
+
+      escapeHtml(
+        data.studentId ||
+        "-"
+      ) +
+
+    "</div>" +
+
+
+    "<div class='detail'>" +
+
+      "วิชา: " +
+
+      escapeHtml(
+        data.subject ||
+        "-"
+      ) +
+
+    "</div>" +
+
+
+    "<div class='detail'>" +
+
+      "เวลา: " +
+
+      escapeHtml(
+        data.time ||
+        "-"
+      ) +
+
+    "</div>" +
+
+
+    (
+      duration
+        ? "<div class='detail'>" +
+          escapeHtml(
+            duration
+          ) +
+          escapeHtml(
+            flag
+          ) +
+          "</div>"
+        : ""
+    ) +
+
+
+    "<div class='detail'>" +
+
+      escapeHtml(
+        data.message ||
+        ""
+      ) +
+
+    "</div>";
+
+}
+
+
+/* =========================================================
+   JSONP API
+========================================================= */
+
+/*
+  สำคัญ:
+
+  GitHub Pages
+        ↓
+  script tag
+        ↓
+  Apps Script
+
+  ไม่ใช้ google.script.run
+  ไม่ใช้ fetch
+*/
+
+function callAPI(
+  action,
+  params = {}
+) {
+
+  return new Promise(
+    (
+      resolve,
+      reject
+    ) => {
+
+
+      const callbackName =
+        "kumonCallback_" +
+        Date.now() +
+        "_" +
+        (++callbackCounter);
+
+
+      const script =
+        document.createElement(
+          "script"
+        );
+
+
+      let finished =
+        false;
+
+
+      const query =
+        new URLSearchParams();
+
+
+      query.set(
+        "action",
+        action
+      );
+
+
+      query.set(
+        "callback",
+        callbackName
+      );
+
+
+      Object.entries(
+        params
+      ).forEach(
+        function([
+          key,
+          value
+        ]) {
+
+          if (
+            value !== undefined &&
+            value !== null
+          ) {
+
+            query.set(
+              key,
+              String(value)
+            );
+
+          }
+
+        }
+      );
+
+
+      const timeout =
+        setTimeout(
+          function() {
+
+            if (finished) {
+              return;
+            }
+
+
+            finished =
+              true;
+
+
+            cleanup();
+
+
+            reject(
+              new Error(
+                "Apps Script ไม่ตอบกลับภายใน 15 วินาที"
+              )
+            );
+
+          },
+          15000
+        );
+
+
+      function cleanup() {
+
+        clearTimeout(
+          timeout
+        );
+
+
+        try {
+
+          delete window[
+            callbackName
+          ];
+
+        } catch (e) {
+
+          window[
+            callbackName
+          ] =
+            undefined;
+
+        }
+
+
+        if (
+          script.parentNode
+        ) {
+
+          script.parentNode.removeChild(
+            script
+          );
+
+        }
+
+      }
+
+
+      window[
+        callbackName
+      ] =
+        function(response) {
+
+          if (finished) {
+            return;
+          }
+
+
+          finished =
+            true;
+
+
+          cleanup();
+
+
+          if (
+            !response
+          ) {
+
+            reject(
+              new Error(
+                "Apps Script ไม่ส่งข้อมูลกลับมา"
+              )
+            );
+
+            return;
+
+          }
+
+
+          if (
+            response.success !== true
+          ) {
+
+            reject(
+              new Error(
+                response.error ||
+                response.message ||
+                "ระบบไม่สามารถดำเนินการได้"
+              )
+            );
+
+            return;
+
+          }
+
+
+          resolve(
+            response
+          );
+
+        };
+
+
+      script.onerror =
+        function() {
+
+          if (finished) {
+            return;
+          }
+
+
+          finished =
+            true;
+
+
+          cleanup();
+
+
+          reject(
+            new Error(
+              "โหลด Apps Script ไม่สำเร็จ"
+            )
+          );
+
+        };
+
+
+      script.src =
+        API_URL +
+        "?" +
+        query.toString();
+
+
+      document.head.appendChild(
+        script
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   TEST API
+========================================================= */
+
+async function testAPI() {
+
+  setStatus(
+    "⏳ กำลังเชื่อมต่อ Apps Script...",
+    "warning"
+  );
+
+
+  try {
+
+    const response =
+      await callAPI(
+        "ping",
+        {
+          branch:
+            BRANCH_ID,
+
+          device:
+            DEVICE_ID
+        }
+      );
+
+
+    if (
+      !response ||
+      response.success !== true
+    ) {
+
+      throw new Error(
+        "Apps Script ตอบกลับไม่ถูกต้อง"
+      );
+
+    }
+
+
+    systemInfo.textContent =
+      "Branch: " +
+      BRANCH_ID +
+      " | Device: " +
+      DEVICE_ID;
+
+
+    setStatus(
+      "🟢 เชื่อมต่อ Apps Script สำเร็จ",
+      "success"
+    );
+
+
+    return true;
+
+
+  } catch (error) {
+
+    console.error(
+      "API TEST ERROR:",
+      error
+    );
+
+
+    setStatus(
+      "❌ เชื่อมต่อ Apps Script ไม่สำเร็จ",
+      "error"
+    );
+
+
+    showDebug(
+      "API TEST ERROR\n\n" +
+      error.message +
+      "\n\n" +
+      API_URL
+    );
+
+
+    return false;
+
+  }
+
+}
+
+
+/* =========================================================
+   DEBUG
+========================================================= */
+
+function showDebug(
+  text
+) {
+
+  const el =
+    document.getElementById(
+      "debug"
+    );
+
+
+  el.style.display =
+    "block";
+
+
+  el.textContent =
+    text;
+
+}
+
+
+/* =========================================================
+   AUDIO
+========================================================= */
+
+function safeBeep() {
+
+  try {
+
+    beep.currentTime =
+      0;
+
+    beep.play()
+      .catch(
+        function() {}
+      );
+
+  } catch (e) {}
+
+}
+
+
+function safeErrorSound() {
+
+  try {
+
+    squeak.currentTime =
+      0;
+
+    squeak.play()
+      .catch(
+        function() {}
+      );
+
+  } catch (e) {}
+
+}
+
+
+/* =========================================================
+   CAMERA LIST
+========================================================= */
+
+async function getCamerasFresh() {
+
+  try {
+
+    const list =
+      await Html5Qrcode
+        .getCameras();
+
+
+    cameras =
+      Array.isArray(list)
+        ? list
+        : [];
+
+
+    return cameras;
+
+
+  } catch (error) {
+
+    console.error(
+      "GET CAMERAS ERROR:",
+      error
+    );
+
+
+    cameras =
+      [];
+
+
+    throw error;
+
+  }
+
+}
+
+
+/* =========================================================
+   PICK CAMERA
+========================================================= */
+
+function pickDefaultCamera(
+  list
+) {
+
+  const savedId =
+    localStorage.getItem(
+      LS_KEY_ID
+    );
+
+
+  if (
+    savedId &&
+    list.some(
+      function(camera) {
+
+        return (
+          camera.id ===
+          savedId
+        );
+
+      }
+    )
+  ) {
+
+    return savedId;
+
+  }
+
+
+  const back =
+    list.find(
+      function(camera) {
+
+        return /back|rear|environment/i
+          .test(
+            camera.label || ""
+          );
+
+      }
+    );
+
+
+  if (back) {
+
+    return back.id;
+
+  }
+
+
+  return list[0]
+    ? list[0].id
+    : null;
+
+}
+
+
+/* =========================================================
+   START WITH DEVICE ID
+========================================================= */
+
+async function startCameraById(
+  deviceId
+) {
+
+  if (!qr) {
+
+    qr =
+      new Html5Qrcode(
+        "scanner"
+      );
+
+  }
+
+
+  /*
+    ถ้ากำลังทำงานอยู่
+    ต้องหยุดก่อน
+  */
+
+  if (cameraRunning) {
+
+    try {
+
+      await qr.stop();
+
+    } catch (e) {}
+
+    cameraRunning =
+      false;
+
+  }
+
+
+  await qr.start(
+
+    {
+      deviceId: {
+        exact:
+          deviceId
+      }
+    },
+
+    {
+      fps:
+        SCAN_FPS,
+
+      qrbox: {
+        width:
+          QR_BOX,
+
+        height:
+          QR_BOX
+      },
+
+      aspectRatio:
+        1.777778
+
+    },
+
+    onScanSuccess,
+
+    function() {}
+
+  );
+
+
+  currentCameraId =
+    deviceId;
+
+
+  currentFacing =
+    null;
+
+
+  localStorage.setItem(
+    LS_KEY_ID,
+    deviceId
+  );
+
+
+  localStorage.removeItem(
+    LS_KEY_FACING
+  );
+
+
+  cameraRunning =
+    true;
+
+
+  cameraStartedUI();
+
+}
+
+
+/* =========================================================
+   START WITH FACING MODE
+========================================================= */
+
+async function startCameraDirect(
+  facing
+) {
+
+  if (!qr) {
+
+    qr =
+      new Html5Qrcode(
+        "scanner"
+      );
+
+  }
+
+
+  if (cameraRunning) {
+
+    try {
+
+      await qr.stop();
+
+    } catch (e) {}
+
+    cameraRunning =
+      false;
+
+  }
+
+
+  await qr.start(
+
+    {
+      facingMode:
+        facing
+    },
+
+    {
+      fps:
+        SCAN_FPS,
+
+      qrbox: {
+        width:
+          QR_BOX,
+
+        height:
+          QR_BOX
+      },
+
+      aspectRatio:
+        1.777778
+
+    },
+
+    onScanSuccess,
+
+    function() {}
+
+  );
+
+
+  currentFacing =
+    facing;
+
+
+  currentCameraId =
+    null;
+
+
+  localStorage.setItem(
+    LS_KEY_FACING,
+    facing
+  );
+
+
+  localStorage.removeItem(
+    LS_KEY_ID
+  );
+
+
+  cameraRunning =
+    true;
+
+
+  cameraStartedUI();
+
+}
+
+
+/* =========================================================
+   CAMERA UI
+========================================================= */
+
+function cameraStartedUI() {
+
+  cameraStatus.textContent =
+    "กล้อง: เปิดแล้ว";
+
+
+  btnStart.disabled =
+    true;
+
+
+  btnStop.disabled =
+    false;
+
+
+  btnSwitch.disabled =
+    cameras.length < 2;
+
+}
+
+
+/* =========================================================
+   START CAMERA SMART
+========================================================= */
+
+async function startCameraSmart() {
+
+  if (isStarting) {
+    return;
+  }
+
+
+  if (cameraRunning) {
+    return;
+  }
+
+
+  isStarting =
+    true;
+
+
+  try {
+
+    if (!qr) {
+
+      qr =
+        new Html5Qrcode(
+          "scanner"
+        );
+
+    }
+
+
+    await getCamerasFresh();
+
+
+    if (
+      cameras.length === 0
+    ) {
+
+      throw new Error(
+        "ไม่พบกล้องในอุปกรณ์"
+      );
+
+    }
+
+
+    /*
+      1. ลองกล้องที่เคยใช้
+    */
+
+    const savedId =
+      localStorage.getItem(
+        LS_KEY_ID
+      );
+
+
+    if (savedId) {
+
+      try {
+
+        await startCameraById(
+          savedId
+        );
+
+        return;
+
+      } catch (error) {
+
+        console.warn(
+          "Saved camera failed:",
+          error
+        );
+
+      }
+
+    }
+
+
+    /*
+      2. ใช้กล้องหลัง
+    */
+
+    try {
+
+      await startCameraDirect(
+        "environment"
+      );
+
+      return;
+
+    } catch (error) {
+
+      console.warn(
+        "Environment failed:",
+        error
+      );
+
+    }
+
+
+    /*
+      3. ถ้าไม่ได้ ใช้กล้องหน้า
+    */
+
+    await startCameraDirect(
+      "user"
+    );
+
+
+  } finally {
+
+    isStarting =
+      false;
+
+  }
+
+}
+
+
+/* =========================================================
+   START SCAN
+========================================================= */
+
+async function startScan() {
+
+  if (isStarting) {
+    return;
+  }
+
+
+  if (cameraRunning) {
+    return;
+  }
+
+
+  if (
+    typeof Html5Qrcode ===
+    "undefined"
+  ) {
+
+    showError(
+      "ไม่พบ QR Scanner กรุณารีเฟรชหน้าเว็บ"
+    );
+
+    return;
+
+  }
+
+
+  cameraStatus.textContent =
+    "กล้อง: กำลังเปิด...";
+
+
+  try {
+
+    await startCameraSmart();
+
+
+    setStatus(
+      "🟢 พร้อมสแกน QR",
+      "success"
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "CAMERA ERROR:",
+      error
+    );
+
+
+    cameraRunning =
+      false;
+
+
+    cameraStatus.textContent =
+      "กล้อง: เปิดไม่สำเร็จ";
+
+
+    showError(
+      getCameraErrorMessage(
+        error
+      )
+    );
+
+
+    btnStart.disabled =
+      false;
+
+
+    btnStop.disabled =
+      true;
+
+
+    btnSwitch.disabled =
+      true;
+
+  }
+
+}
+
+
+/* =========================================================
+   CAMERA ERROR
+========================================================= */
+
+function getCameraErrorMessage(
+  error
+) {
+
+  const name =
+    error &&
+    error.name
+      ? error.name
+      : "Error";
+
+
+  const message =
+    error &&
+    error.message
+      ? error.message
+      : String(error);
+
+
+  if (
+    /NotAllowedError/i
+      .test(
+        name + " " + message
+      )
+  ) {
+
+    return (
+      "เปิดกล้องไม่ได้: " +
+      "Browser ไม่อนุญาตให้ใช้กล้อง " +
+      "(" +
+      name +
+      ")"
+    );
+
+  }
+
+
+  if (
+    /NotFoundError/i
+      .test(
+        name + " " + message
+      )
+  ) {
+
+    return (
+      "ไม่พบกล้องในอุปกรณ์"
+    );
+
+  }
+
+
+  if (
+    /NotReadableError/i
+      .test(
+        name + " " + message
+      )
+  ) {
+
+    return (
+      "กล้องกำลังถูกใช้งานโดยแอปอื่น"
+    );
+
+  }
+
+
+  if (
+    /transition/i
+      .test(
+        message
+      )
+  ) {
+
+    return (
+      "กล้องกำลังเปลี่ยนสถานะ " +
+      "กรุณารอสักครู่"
+    );
+
+  }
+
+
+  return (
+    "เปิดกล้องไม่ได้: " +
+    name +
+    " — " +
+    message
+  );
+
+}
+
+
+/* =========================================================
+   STOP CAMERA
+========================================================= */
+
+async function stopScanner() {
+
+  if (
+    !qr ||
+    isStopping
+  ) {
+
+    return;
+
+  }
+
+
+  isStopping =
+    true;
+
+
+  try {
+
+    if (cameraRunning) {
+
+      await qr.stop();
+
+    }
+
+  } catch (error) {
+
+    console.warn(
+      "STOP CAMERA:",
+      error
+    );
+
+  }
+
+
+  cameraRunning =
+    false;
+
+
+  isStopping =
+    false;
+
+
+  cameraStatus.textContent =
+    "กล้อง: หยุดแล้ว";
+
+
+  btnStart.disabled =
+    false;
+
+
+  btnStop.disabled =
+    true;
+
+
+  btnSwitch.disabled =
+    true;
+
+}
+
+
+async function stopScan() {
+
+  await stopScanner();
+
+}
+
+
+/* =========================================================
+   SWITCH CAMERA
+========================================================= */
+
+async function switchCamera() {
+
+  if (
+    isStarting ||
+    isStopping ||
+    !cameraRunning
+  ) {
+
+    return;
+
+  }
+
+
+  isStopping =
+    true;
+
+
+  try {
+
+    await qr.stop();
+
+    cameraRunning =
+      false;
+
+
+    await getCamerasFresh();
+
+
+    if (
+      cameras.length >= 2 &&
+      currentCameraId
+    ) {
+
+      const index =
+        cameras.findIndex(
+          function(camera) {
+
+            return (
+              camera.id ===
+              currentCameraId
+            );
+
+          }
+        );
+
+
+      const nextIndex =
+        index === -1
+          ? 0
+          : (
+              index + 1
+            ) %
+            cameras.length;
+
+
+      isStopping =
+        false;
+
+
+      await startCameraById(
+        cameras[nextIndex].id
+      );
+
+
+      setStatus(
+        "🔄 สลับกล้องแล้ว",
+        "success"
+      );
+
+
+      return;
+
+    }
+
+
+    /*
+      fallback:
+      facing mode
+    */
+
+    const nextFacing =
+      currentFacing ===
+        "environment"
+        ? "user"
+        : "environment";
+
+
+    isStopping =
+      false;
+
+
+    await startCameraDirect(
+      nextFacing
+    );
+
+
+    setStatus(
+      "🔄 สลับกล้องแล้ว",
+      "success"
+    );
+
+
+  } catch (error) {
+
+    isStopping =
+      false;
+
+
+    cameraRunning =
+      false;
+
+
+    showError(
+      "สลับกล้องไม่สำเร็จ: " +
+      getCameraErrorMessage(
+        error
+      )
+    );
+
+
+    btnStart.disabled =
+      false;
+
+
+    btnStop.disabled =
+      true;
+
+
+    btnSwitch.disabled =
+      true;
+
+  }
+
+}
+
+
+/* =========================================================
+   QR SUCCESS
+========================================================= */
+
+async function onScanSuccess(
+  decodedText
+) {
+
+  if (
+    busy ||
+    !cameraRunning ||
+    !decodedText
+  ) {
+
+    return;
+
+  }
+
+
+  busy =
+    true;
+
+
+  /*
+    หยุดกล้องก่อน
+    ป้องกัน QR เดิมยิงซ้ำ
+  */
+
+  try {
+
+    await stopScanner();
+
+  } catch (error) {
+
+    console.warn(
+      error
+    );
+
+  }
+
+
+  resultEl.className =
+    "card result";
+
+
+  resultEl.innerHTML =
+    "⏳ กำลังบันทึกข้อมูล...";
+
+
+  setStatus(
+    "⏳ กำลังส่งข้อมูลไป Apps Script...",
+    "info"
+  );
+
+
+  try {
+
+    const response =
+      await callAPI(
+
+        "scan",
+
+        {
+
+          branch:
+            BRANCH_ID,
+
+          device:
+            DEVICE_ID,
+
+          payload:
+            decodedText
+
+        }
+
+      );
+
+
+    safeBeep();
+
+
+    showOK(
+      response
+    );
+
+
+    setStatus(
+      "✅ บันทึกข้อมูลสำเร็จ",
+      "success"
+    );
+
+
+    /*
+      อัปเดต Board
+    */
+
+    refreshBoards();
+
+
+    /*
+      เปิดกล้องใหม่อัตโนมัติ
+    */
+
+    setTimeout(
+      function() {
+
+        busy =
+          false;
+
+
+        startScan();
+
+      },
+      700
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "SCAN ERROR:",
+      error
+    );
+
+
+    safeErrorSound();
+
+
+    showError(
+      error.message
+    );
+
+
+    setStatus(
+      "❌ " +
+      error.message,
+      "error"
+    );
+
+
+    busy =
+      false;
+
+
+    /*
+      ให้ผู้ใช้เปิดกล้องใหม่
+      ไม่เปิดซ้อนทันที
+    */
+
+  }
+
+}
+
+
+/* =========================================================
+   STATUS BOARD
+========================================================= */
+
+async function refreshBoards() {
+
+  if (!BRANCH_ID) {
+    return;
+  }
+
+
+  /*
+    MATH
+  */
+
+  try {
+
+    const response =
+      await callAPI(
+
+        "status",
+
+        {
+
+          branch:
+            BRANCH_ID,
+
+          subject:
+            "MATH"
+
+        }
+
+      );
+
+
+    renderBoard(
+      "list-math",
+      "count-math",
+      response.data
+    );
+
+
+  } catch (error) {
+
+    console.warn(
+      "MATH BOARD:",
+      error
+    );
+
+  }
+
+
+  /*
+    LANGUAGE
+    ใช้ action=languages
+    เพราะ Backend รองรับ ENG/TRP/EFL
+  */
+
+  try {
+
+    const response =
+      await callAPI(
+
+        "languages",
+
+        {
+
+          branch:
+            BRANCH_ID
+
+        }
+
+      );
+
+
+    renderBoard(
+      "list-lang",
+      "count-lang",
+      response.data
+    );
+
+
+  } catch (error) {
+
+    console.warn(
+      "LANG BOARD:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   RENDER BOARD
+========================================================= */
+
+function renderBoard(
+  listId,
+  countId,
+  list
+) {
+
+  const listEl =
+    document.getElementById(
+      listId
+    );
+
+
+  const countEl =
+    document.getElementById(
+      countId
+    );
+
+
+  if (!listEl) {
+    return;
+  }
+
+
+  list =
+    Array.isArray(list)
+      ? list
+      : [];
+
+
+  countEl.textContent =
+    list.length +
+    " คน";
+
+
+  if (
+    list.length === 0
+  ) {
+
+    listEl.innerHTML =
+      '<div class="meta">' +
+      '— ไม่มีคนกำลังเรียน —' +
+      '</div>';
+
+
+    return;
+
+  }
+
+
+  listEl.innerHTML =
+    list
+      .map(
+        function(item) {
+
+          const overClass =
+            item.over
+              ? " status-over"
+              : "";
+
+
+          const warning =
+            item.over
+              ? " ⏰ เกินเวลา"
+              : "";
+
+
+          return (
+
+            '<div class="item' +
+            overClass +
+            '">' +
+
+
+              '<div>' +
+
+                '<div class="name">' +
+
+                  escapeHtml(
+                    item.fullName ||
+                    item.studentId
+                  ) +
+
+                '</div>' +
+
+
+                '<div class="meta">' +
+
+                  escapeHtml(
+                    item.studentId
+                  ) +
+
+                  " | " +
+
+                  escapeHtml(
+                    item.subject
+                  ) +
+
+                '</div>' +
+
+              '</div>' +
+
+
+              '<div class="meta">' +
+
+                escapeHtml(
+                  item.minutes
+                ) +
+
+                " นาที" +
+
+                warning +
+
+              '</div>' +
+
+
+            '</div>'
+
+          );
+
+        }
+      )
+      .join("");
+
+}
+
+
+/* =========================================================
+   AUTO REFRESH BOARD
+========================================================= */
+
+let boardTimer =
+  null;
+
+
+function startBoardTimer() {
+
+  if (boardTimer) {
+    return;
+  }
+
+
+  boardTimer =
+    setInterval(
+      function() {
+
+        refreshBoards();
+
+      },
+      10000
+    );
+
+}
+
+
+/* =========================================================
+   PAGE LOAD
 ========================================================= */
 
 window.addEventListener(
   "load",
-  function() {
-
-    /*
-       ทดสอบ Apps Script ทันที
-       แต่ยังไม่เปิดกล้อง
-    */
-
-    testAppsScript();
-
-  }
-);
-
-
-/* =========================================================
-   PAGE HIDDEN
-========================================================= */
-
-document.addEventListener(
-  "visibilitychange",
   async function() {
 
-    if (
-      document.hidden &&
-      cameraRunning
-    ) {
+    /*
+      1. เชื่อมต่อ API
+    */
 
-      await stopCamera();
+    const connected =
+      await testAPI();
+
+
+    /*
+      2. ถ้าเชื่อมต่อได้
+         โหลด Board
+    */
+
+    if (connected) {
+
+      refreshBoards();
+
+      startBoardTimer();
 
     }
 
   }
 );
 
+
+/* =========================================================
+   PAGE VISIBILITY
+========================================================= */
+
+document.addEventListener(
+  "visibilitychange",
+  function() {
+
+    if (
+      document.visibilityState ===
+      "visible"
+    ) {
+
+      refreshBoards();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   GLOBAL FUNCTIONS
+========================================================= */
+
+window.startScan =
+  startScan;
+
+
+window.stopScan =
+  stopScan;
+
+
+window.switchCamera =
+  switchCamera;
+
 </script>
 
+
 </body>
+
 </html>
